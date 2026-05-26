@@ -1,0 +1,461 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  VERIFIED_CONTRIBUTOR
+  MODERATOR
+  ADMIN
+  VERIFIED_INSTITUTION
+}
+
+enum PlaceType {
+  CBD_SHOP
+  TOBACCO
+  ESHOP
+  VENDING_MACHINE
+  SOCIAL_NETWORK
+  INFORMAL_MARKET
+  EVENT
+  OTHER
+}
+
+enum ProductType {
+  FLOWER
+  RESIN
+  VAPE
+  CARTRIDGE
+  LIQUID
+  CANDY
+  OIL
+  CAPSULE
+  POWDER
+  SPRAY
+  OTHER
+}
+
+enum FormOfUse {
+  INHALATION
+  DABBING
+  PIPE
+  WATER_PIPE
+  INFUSION
+  INGESTION
+  OTHER
+}
+
+enum PriceMode {
+  PER_GRAM
+  TOTAL
+  UNKNOWN
+}
+
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  PENDING_REVIEW
+  PUBLISHED_LIMITED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+  CONTESTED
+}
+
+enum ProofLevel {
+  L1_TESTIMONY
+  L2_VISUAL
+  L3_COMMERCIAL_DOC
+  L4_LAB_ANALYSIS
+  L5_SANITARY_SIGNAL
+}
+
+enum MoleculeKind {
+  ANNOUNCED
+  SUSPECTED
+  COMPOSITION
+}
+
+enum EvidenceType {
+  PHOTO_PACKAGING
+  SCREENSHOT
+  RECEIPT_LABEL
+  COMMERCIAL_LISTING
+  LAB_RESULT
+  OTHER
+}
+
+enum ModerationActionType {
+  SUBMIT
+  REQUEST_PROOF
+  MASK_ADDRESS
+  CHANGE_PROOF_LEVEL
+  PUBLISH_LIMITED
+  PUBLISH
+  REJECT
+  ARCHIVE
+  CONTEST
+  MERGE
+  NOTE
+  ROLE_CHANGE
+  VALIDATE_EVIDENCE
+  DELETE_ACCOUNT
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  passwordHash        String    @map("password_hash")
+  role                UserRole  @default(USER)
+  emailVerifiedAt     DateTime? @map("email_verified_at")
+  termsAcceptedAt     DateTime? @map("terms_accepted_at")
+  charterAcceptedAt   DateTime? @map("charter_accepted_at")
+  charterVersion      String?   @map("charter_version")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  lastLoginIpHash     String?   @map("last_login_ip_hash")
+  bannedAt            DateTime? @map("banned_at")
+
+  reports             Report[]
+  declarations        AdverseEffectDeclaration[]
+  moderationActions   ModerationAction[]
+  auditLogs           AuditLog[]
+  emailTokens         EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique @map("token_hash")
+  userId    String    @map("user_id")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique @map("token_hash")
+  userId    String    @map("user_id")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model Location {
+  id          String  @id @default(cuid())
+  countryCode String @map("country_code")
+  countryName String @map("country_name")
+  region      String?
+  city        String
+  district    String?
+  postcode    String?
+  displayZone String @map("display_zone")
+  centroidLat Float  @map("centroid_lat")
+  centroidLng Float  @map("centroid_lng")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  reports Report[]
+  declarations AdverseEffectDeclaration[]
+
+  @@unique([countryCode, city, district])
+  @@index([countryCode, city])
+  @@map("locations")
+}
+
+model Brand {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  slug      String        @unique
+  country   String?
+  status    ProductStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  products Product[]
+  reports  Report[]
+  declarations AdverseEffectDeclaration[]
+
+  @@map("brands")
+}
+
+model Product {
+  id                 String        @id @default(cuid())
+  brandId            String?       @map("brand_id")
+  commercialName     String        @map("commercial_name")
+  slug               String
+  defaultProductType ProductType?  @map("default_product_type")
+  status             ProductStatus @default(ACTIVE)
+  firstSeenAt        DateTime?     @map("first_seen_at")
+  lastSeenAt         DateTime?     @map("last_seen_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  brand Brand? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  reports Report[]
+  declarations AdverseEffectDeclaration[]
+
+  @@unique([brandId, slug])
+  @@index([commercialName])
+  @@map("products")
+}
+
+model Molecule {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  reports ReportMolecule[]
+  declarations AdverseEffectDeclarationMolecule[]
+
+  @@map("molecules")
+}
+
+model MarketingClaim {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  reports ReportMarketingClaim[]
+
+  @@map("marketing_claims")
+}
+
+model AdverseEffect {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  reports ReportAdverseEffect[]
+  declarations AdverseEffectDeclarationEffect[]
+
+  @@map("adverse_effects")
+}
+
+model Report {
+  id                  String       @id @default(cuid())
+  createdById          String?      @map("created_by_id")
+  locationId           String       @map("location_id")
+  placeType            PlaceType    @map("place_type")
+  placeOtherLabel      String?      @map("place_other_label")
+  brandId              String?      @map("brand_id")
+  brandRawName         String?      @map("brand_raw_name")
+  productId            String?      @map("product_id")
+  productCommercialName String?     @map("product_commercial_name")
+  productType          ProductType? @map("product_type")
+  productOtherLabel    String?      @map("product_other_label")
+  formOfUse            FormOfUse?   @map("form_of_use")
+  quantityObserved     Decimal?     @db.Decimal(10, 2) @map("quantity_observed")
+  priceObserved        Decimal?     @db.Decimal(10, 2) @map("price_observed")
+  priceMode            PriceMode?   @map("price_mode")
+  observationDate      DateTime     @map("observation_date")
+  narrative            String?      @db.Text
+  moderationStatus     ReportStatus @default(PENDING_REVIEW) @map("moderation_status")
+  proofLevel           ProofLevel   @default(L1_TESTIMONY) @map("proof_level")
+  exactAddressEncrypted String?     @db.Text @map("exact_address_encrypted")
+  exactLat             Float?       @map("exact_lat")
+  exactLng             Float?       @map("exact_lng")
+  publishedAt          DateTime?    @map("published_at")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  location  Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  brand     Brand? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  molecules ReportMolecule[]
+  marketingClaims ReportMarketingClaim[]
+  adverseEffects ReportAdverseEffect[]
+  evidence Evidence[]
+  moderationActions ModerationAction[]
+
+  @@index([moderationStatus, proofLevel])
+  @@index([locationId, moderationStatus])
+  @@index([createdById])
+  @@map("reports")
+}
+
+model ReportMolecule {
+  reportId   String       @map("report_id")
+  moleculeId String       @map("molecule_id")
+  kind       MoleculeKind
+
+  report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  molecule Molecule @relation(fields: [moleculeId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, moleculeId, kind])
+  @@index([moleculeId])
+  @@map("report_molecules")
+}
+
+model ReportMarketingClaim {
+  reportId String @map("report_id")
+  claimId  String @map("claim_id")
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  claim  MarketingClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, claimId])
+  @@index([claimId])
+  @@map("report_marketing_claims")
+}
+
+model ReportAdverseEffect {
+  reportId String @map("report_id")
+  effectId String @map("effect_id")
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  effect AdverseEffect @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, effectId])
+  @@index([effectId])
+  @@map("report_adverse_effects")
+}
+
+model Evidence {
+  id            String       @id @default(cuid())
+  reportId      String?      @map("report_id")
+  declarationId String?      @map("declaration_id")
+  type          EvidenceType
+  filePath      String       @map("file_path")
+  mimeType      String       @map("mime_type")
+  originalName  String?      @map("original_name")
+  exifStrippedAt DateTime?   @map("exif_stripped_at")
+  width         Int?
+  height        Int?
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  report Report? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  declaration AdverseEffectDeclaration? @relation(fields: [declarationId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([declarationId])
+  @@map("evidence")
+}
+
+model AdverseEffectDeclaration {
+  id                  String       @id @default(cuid())
+  createdById          String?      @map("created_by_id")
+  locationId           String?      @map("location_id")
+  productId            String?      @map("product_id")
+  brandId              String?      @map("brand_id")
+  productNameRaw       String?      @map("product_name_raw")
+  brandNameRaw         String?      @map("brand_name_raw")
+  countryCode          String?      @map("country_code")
+  approximatePeriod    String?      @map("approximate_period")
+  effectDuration       String?      @map("effect_duration")
+  withdrawalSymptoms   String?      @db.Text @map("withdrawal_symptoms")
+  medicalCare          Boolean      @default(false) @map("medical_care")
+  wantsContact         Boolean      @default(false) @map("wants_contact")
+  contactEmailEncrypted String?     @db.Text @map("contact_email_encrypted")
+  narrative            String?      @db.Text
+  moderationStatus     ReportStatus @default(PENDING_REVIEW) @map("moderation_status")
+  proofLevel           ProofLevel   @default(L1_TESTIMONY) @map("proof_level")
+  createdAt            DateTime     @default(now()) @map("created_at")
+  updatedAt            DateTime     @updatedAt @map("updated_at")
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  location Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  brand Brand? @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  molecules AdverseEffectDeclarationMolecule[]
+  effects AdverseEffectDeclarationEffect[]
+  evidence Evidence[]
+  moderationActions ModerationAction[]
+
+  @@index([moderationStatus, proofLevel])
+  @@map("adverse_effect_declarations")
+}
+
+model AdverseEffectDeclarationMolecule {
+  declarationId String       @map("declaration_id")
+  moleculeId    String       @map("molecule_id")
+  kind          MoleculeKind
+
+  declaration AdverseEffectDeclaration @relation(fields: [declarationId], references: [id], onDelete: Cascade)
+  molecule    Molecule @relation(fields: [moleculeId], references: [id], onDelete: Cascade)
+
+  @@id([declarationId, moleculeId, kind])
+  @@index([moleculeId])
+  @@map("adverse_effect_declaration_molecules")
+}
+
+model AdverseEffectDeclarationEffect {
+  declarationId String @map("declaration_id")
+  effectId      String @map("effect_id")
+
+  declaration AdverseEffectDeclaration @relation(fields: [declarationId], references: [id], onDelete: Cascade)
+  effect      AdverseEffect @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([declarationId, effectId])
+  @@index([effectId])
+  @@map("adverse_effect_declaration_effects")
+}
+
+model ModerationAction {
+  id             String               @id @default(cuid())
+  reportId       String?              @map("report_id")
+  declarationId  String?              @map("declaration_id")
+  moderatorId    String?              @map("moderator_id")
+  action         ModerationActionType
+  beforeStatus   ReportStatus?        @map("before_status")
+  afterStatus    ReportStatus?        @map("after_status")
+  notes          String?              @db.Text
+  createdAt      DateTime             @default(now()) @map("created_at")
+
+  report      Report? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  declaration AdverseEffectDeclaration? @relation(fields: [declarationId], references: [id], onDelete: Cascade)
+  moderator   User? @relation(fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  @@index([reportId, createdAt])
+  @@index([declarationId, createdAt])
+  @@index([moderatorId, createdAt])
+  @@map("moderation_actions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?  @map("user_id")
+  ipHash     String?  @map("ip_hash")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([targetType, targetId])
+  @@map("audit_log")
+}

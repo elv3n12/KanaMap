@@ -1,0 +1,11 @@
+.env
+node_modules/
+.next/
+dist/
+uploads/
+backups/
+*.log
+.DS_Store
+apps/web/.next/
+apps/web/node_modules/
+apps/worker/node_modules/

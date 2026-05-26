@@ -1,0 +1,9 @@
+.git
+.next
+node_modules
+apps/web/.next
+apps/web/node_modules
+apps/worker/node_modules
+backups
+uploads
+.env

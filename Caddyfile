@@ -1,0 +1,10 @@
+{$APP_DOMAIN:localhost} {
+  encode zstd gzip
+
+  handle_path /uploads/* {
+    root * /srv/uploads
+    file_server
+  }
+
+  reverse_proxy web:3000
+}
