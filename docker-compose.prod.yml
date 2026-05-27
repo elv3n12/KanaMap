@@ -1,0 +1,72 @@
+services:
+  web:
+    image: ghcr.io/elv3n12/kanamap:latest
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_TRUST_HOST=true
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - APP_NAME=${APP_NAME}
+      - APP_NAME_FR=${APP_NAME_FR}
+      - APP_TAGLINE_FR=${APP_TAGLINE_FR}
+      - IP_HASH_SALT=${IP_HASH_SALT}
+      - TOKEN_HASH_SECRET=${TOKEN_HASH_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - SEED_ADMIN_EMAIL=${SEED_ADMIN_EMAIL}
+      - SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
+      - SEED_MODERATOR_EMAIL=${SEED_MODERATOR_EMAIL}
+      - SHOW_FIXTURE_BADGE=${SHOW_FIXTURE_BADGE}
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - NOMINATIM_EMAIL=${NOMINATIM_EMAIL}
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - web_uploads:/app/uploads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kanamap.rule=Host(`kanamap.srv1339684.hstgr.cloud`)
+      - traefik.http.routers.kanamap.tls=true
+      - traefik.http.routers.kanamap.entrypoints=web,websecure
+      - traefik.http.routers.kanamap.tls.certresolver=mytlschallenge
+      - traefik.http.services.kanamap.loadbalancer.server.port=3000
+    networks:
+      - n8n_default
+      - default
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - default
+
+networks:
+  n8n_default:
+    external: true
+  default:
+
+volumes:
+  mysql_data:
+  web_uploads:
