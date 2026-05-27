@@ -9,6 +9,7 @@ import {
   PRODUCT_TYPE_LABELS,
   PROOF_LEVEL_LABELS,
 } from "@/lib/constants";
+import { btnPrimary } from "@/lib/ui/button-classes";
 
 const EUROPEAN_COUNTRIES = [
   { code: "FR", name: "France" },
@@ -143,7 +144,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
       {/* Step 1: Zone d'observation */}
       <section>
         <h2 className="text-xl font-semibold">1. Zone d&apos;observation</h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-slate-700">
           Sélectionnez le pays et la ville où l&apos;observation a été faite.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -247,8 +248,6 @@ export function ReportForm({ molecules, claims, effects }: Props) {
               </option>
             ))}
           </select>
-          <input name="quantityObserved" inputMode="decimal" className="rounded-lg border p-3" placeholder="Quantité observée (statistique)" />
-          <input name="priceObserved" inputMode="decimal" className="rounded-lg border p-3" placeholder="Prix observé (statistique, non public)" />
         </div>
       </section>
 
@@ -286,8 +285,8 @@ export function ReportForm({ molecules, claims, effects }: Props) {
         />
       </section>
 
-      <button className="w-full rounded-lg bg-slate-900 px-4 py-3 font-medium text-white" type="submit">
-        Soumettre à la modération
+      <button className={`${btnPrimary} w-full`} type="submit">
+        Soumettre le signalement
       </button>
     </form>
   );

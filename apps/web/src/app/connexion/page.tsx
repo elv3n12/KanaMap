@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loginAction } from "./actions";
+import { btnPrimaryBlack, linkNav } from "@/lib/ui/button-classes";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -28,13 +29,17 @@ export default async function ConnexionPage({ searchParams }: Props) {
           Mot de passe
           <input required name="password" type="password" className="mt-1 w-full rounded-lg border p-3" />
         </label>
-        <button className="w-full rounded-lg bg-black px-4 py-3 font-medium text-white" type="submit">
+        <button className={btnPrimaryBlack} type="submit">
           Se connecter
         </button>
       </form>
       <div className="mt-4 flex justify-between text-sm">
-        <Link className="underline" href="/inscription">Créer un compte</Link>
-        <Link className="underline" href="/mot-de-passe-oublie">Mot de passe oublié</Link>
+        <Link className={linkNav} href="/inscription">
+          Créer un compte
+        </Link>
+        <Link className={linkNav} href="/mot-de-passe-oublie">
+          Mot de passe oublié
+        </Link>
       </div>
     </div>
   );

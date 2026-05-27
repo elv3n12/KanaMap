@@ -3,6 +3,7 @@ import { UserRole } from "@prisma/client";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { updateRoleAction, upsertLookupAction } from "./actions";
+import { btnPrimary } from "@/lib/ui/button-classes";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,9 @@ export default async function AdminPage() {
               <select name="role" defaultValue={user.role} className="rounded-lg border p-2">
                 {Object.values(UserRole).map((role) => <option key={role} value={role}>{role}</option>)}
               </select>
-              <button className="rounded-lg bg-slate-900 px-3 py-2 text-white">Mettre à jour</button>
+              <button className={btnPrimary} type="submit">
+                Mettre à jour
+              </button>
             </form>
           ))}
         </div>
@@ -79,7 +82,9 @@ function Lookup({ title, type, labels }: { title: string; type: string; labels: 
       <form action={upsertLookupAction} className="mt-4 flex gap-2">
         <input type="hidden" name="type" value={type} />
         <input required name="label" className="min-w-0 flex-1 rounded-lg border p-2" placeholder="Ajouter" />
-        <button className="rounded-lg bg-slate-900 px-3 py-2 text-white">OK</button>
+        <button className={btnPrimary} type="submit">
+          OK
+        </button>
       </form>
       <p className="mt-3 text-sm leading-6 text-slate-600">{labels.join(", ")}</p>
     </div>

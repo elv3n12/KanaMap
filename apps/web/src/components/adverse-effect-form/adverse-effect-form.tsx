@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { AdverseEffect, Molecule } from "@prisma/client";
+import { btnPrimary } from "@/lib/ui/button-classes";
 
 type Props = {
   molecules: Molecule[];
@@ -57,8 +58,8 @@ export function AdverseEffectForm({ molecules, effects }: Props) {
         J’accepte d’être recontacté par l’équipe de modération
       </label>
       <input name="contactEmail" type="email" className="w-full rounded-lg border p-3" placeholder="Email de contact (facultatif, non public)" />
-      <button className="w-full rounded-lg bg-slate-900 px-4 py-3 font-medium text-white" type="submit">
-        Transmettre à la modération
+      <button className={`w-full ${btnPrimary}`} type="submit">
+        Transmettre la déclaration
       </button>
     </form>
   );

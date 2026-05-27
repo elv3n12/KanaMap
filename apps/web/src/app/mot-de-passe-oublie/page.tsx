@@ -1,3 +1,5 @@
+import { btnPrimaryBlack } from "@/lib/ui/button-classes";
+
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export default async function ForgotPasswordPage({ searchParams }: Props) {
@@ -16,7 +18,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
           Email
           <input required name="email" type="email" className="mt-1 w-full rounded-lg border p-3" />
         </label>
-        <button className="w-full rounded-lg bg-black px-4 py-3 font-medium text-white" type="submit">
+        <button className={btnPrimaryBlack} type="submit">
           Envoyer le lien
         </button>
       </form>

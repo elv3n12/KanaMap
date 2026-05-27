@@ -1,3 +1,5 @@
+import { btnPrimaryBlack } from "@/lib/ui/button-classes";
+
 type Props = { params: Promise<{ token: string }> };
 
 export default async function ResetPasswordPage({ params }: Props) {
@@ -11,7 +13,7 @@ export default async function ResetPasswordPage({ params }: Props) {
           Nouveau mot de passe
           <input required minLength={8} name="password" type="password" className="mt-1 w-full rounded-lg border p-3" />
         </label>
-        <button className="w-full rounded-lg bg-black px-4 py-3 font-medium text-white" type="submit">
+        <button className={btnPrimaryBlack} type="submit">
           Enregistrer
         </button>
       </form>

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PROOF_LEVEL_LABELS } from "@/lib/constants";
+import { btnDestructive, btnPrimary, btnSecondary } from "@/lib/ui/button-classes";
 
 type Props = {
   reportId: string;
@@ -24,20 +25,57 @@ export function ReportActions({ reportId }: Props) {
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-semibold">Actions de modération</h2>
-      <textarea value={notes} onChange={(event) => setNotes(event.target.value)} className="mt-4 w-full rounded-lg border p-3" rows={4} placeholder="Note interne ou motif" />
-      <select value={proofLevel} onChange={(event) => setProofLevel(event.target.value)} className="mt-3 w-full rounded-lg border p-3">
-        {Object.entries(PROOF_LEVEL_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+      <h2 className="text-xl font-semibold text-slate-900">Actions de modération</h2>
+      <label htmlFor="mod-notes" className="mt-4 block text-sm font-medium text-slate-800">
+        Note interne ou motif
+      </label>
+      <textarea
+        id="mod-notes"
+        value={notes}
+        onChange={(event) => setNotes(event.target.value)}
+        className="mt-1 w-full rounded-lg border border-slate-300 p-3 text-slate-900"
+        rows={4}
+      />
+      <label htmlFor="mod-proof" className="mt-3 block text-sm font-medium text-slate-800">
+        Niveau de preuve
+      </label>
+      <select
+        id="mod-proof"
+        value={proofLevel}
+        onChange={(event) => setProofLevel(event.target.value)}
+        className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 p-3 text-slate-900"
+      >
+        {Object.entries(PROOF_LEVEL_LABELS).map(([value, label]) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
       </select>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        <button type="button" onClick={() => submit("PUBLISH")} className="rounded-lg bg-slate-900 px-3 py-2 text-white">Publier</button>
-        <button type="button" onClick={() => submit("PUBLISH_LIMITED")} className="rounded-lg border px-3 py-2">Publier limité</button>
-        <button type="button" onClick={() => submit("REQUEST_PROOF")} className="rounded-lg border px-3 py-2">Demander preuves</button>
-        <button type="button" onClick={() => submit("MASK_ADDRESS")} className="rounded-lg border px-3 py-2">Masquer adresse</button>
-        <button type="button" onClick={() => submit("CHANGE_PROOF_LEVEL")} className="rounded-lg border px-3 py-2">Changer niveau preuve</button>
-        <button type="button" onClick={() => submit("CONTEST")} className="rounded-lg border px-3 py-2">Contester</button>
-        <button type="button" onClick={() => submit("REJECT")} className="rounded-lg bg-red-900 px-3 py-2 text-white">Rejeter</button>
-        <button type="button" onClick={() => submit("ARCHIVE")} className="rounded-lg border px-3 py-2">Archiver</button>
+        <button type="button" onClick={() => submit("PUBLISH")} className={btnPrimary}>
+          Publier
+        </button>
+        <button type="button" onClick={() => submit("PUBLISH_LIMITED")} className={btnSecondary}>
+          Publier limité
+        </button>
+        <button type="button" onClick={() => submit("REQUEST_PROOF")} className={btnSecondary}>
+          Demander preuves
+        </button>
+        <button type="button" onClick={() => submit("MASK_ADDRESS")} className={btnSecondary}>
+          Masquer adresse
+        </button>
+        <button type="button" onClick={() => submit("CHANGE_PROOF_LEVEL")} className={btnSecondary}>
+          Changer niveau preuve
+        </button>
+        <button type="button" onClick={() => submit("CONTEST")} className={btnSecondary}>
+          Contester
+        </button>
+        <button type="button" onClick={() => submit("REJECT")} className={btnDestructive}>
+          Rejeter
+        </button>
+        <button type="button" onClick={() => submit("ARCHIVE")} className={btnSecondary}>
+          Archiver
+        </button>
       </div>
     </div>
   );

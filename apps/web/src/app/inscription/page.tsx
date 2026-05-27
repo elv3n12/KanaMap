@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TurnstileWidget } from "@/components/turnstile-widget";
+import { btnPrimaryBlack } from "@/lib/ui/button-classes";
 
 export default function InscriptionPage() {
   return (
@@ -27,7 +28,7 @@ export default function InscriptionPage() {
           <span>J’accepte la <Link href="/charte" className="underline">charte de contribution</Link>.</span>
         </label>
         <TurnstileWidget />
-        <button className="w-full rounded-lg bg-black px-4 py-3 font-medium text-white" type="submit">
+        <button className={btnPrimaryBlack} type="submit">
           Créer mon compte
         </button>
       </form>

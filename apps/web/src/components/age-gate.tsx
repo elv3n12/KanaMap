@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { btnPrimaryBlack } from "@/lib/ui/button-classes";
 
 const key = "kanamap-age-ok";
 
@@ -23,7 +24,7 @@ export function AgeGate() {
         </p>
         <button
           type="button"
-          className="mt-5 w-full rounded-lg bg-black px-4 py-3 font-medium text-white"
+          className={`mt-5 ${btnPrimaryBlack}`}
           onClick={() => {
             localStorage.setItem(key, "1");
             setVisible(false);

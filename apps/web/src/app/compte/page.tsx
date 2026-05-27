@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { deleteAccountAction } from "./actions";
+import { btnDestructive, btnNavPill, btnSecondary } from "@/lib/ui/button-classes";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +27,12 @@ export default async function AccountPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <h1 className="text-3xl font-semibold">Mon compte</h1>
-      <p className="mt-2 text-sm text-slate-600">{session.user.email}</p>
+      <p className="mt-2 text-sm text-slate-700">{session.user.email}</p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/signalements/nouveau" className="rounded-lg bg-slate-900 px-4 py-2 text-white">
+        <Link href="/signalements/nouveau" className={btnNavPill}>
           Soumettre un signalement
         </Link>
-        <Link href="/declarer-effet-indesirable" className="rounded-lg border px-4 py-2">
+        <Link href="/declarer-effet-indesirable" className={btnSecondary}>
           Déclarer un effet indésirable
         </Link>
       </div>
@@ -59,7 +60,7 @@ export default async function AccountPage() {
           La suppression anonymise vos contributions pour préserver l’intérêt public des données
           agrégées.
         </p>
-        <button className="mt-4 rounded-lg bg-red-900 px-4 py-2 text-white" type="submit">
+        <button className={`mt-4 ${btnDestructive}`} type="submit">
           Supprimer mon compte
         </button>
       </form>

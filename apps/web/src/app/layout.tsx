@@ -32,8 +32,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-zinc-50 text-zinc-950">
+        <a href="#main-content" className="skip-link">
+          Aller au contenu principal
+        </a>
         <SiteHeader />
-        <main className="min-h-screen pb-20 pt-14">{children}</main>
+        <main id="main-content" className="min-h-screen pb-20 pt-14" tabIndex={-1}>
+          {children}
+        </main>
         <RiskBanner />
         <AgeGate />
       </body>
