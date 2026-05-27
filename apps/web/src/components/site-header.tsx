@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { AdminNavLink } from "@/components/admin/admin-nav-link";
 import { branding } from "@/lib/branding";
+import { canModerate } from "@/lib/moderation";
 import { btnNavPill, btnNavPillBlack, linkNav } from "@/lib/ui/button-classes";
 
 export async function SiteHeader() {
@@ -36,16 +38,7 @@ export async function SiteHeader() {
               <Link href="/compte" className={linkNav}>
                 Compte
               </Link>
-              {["MODERATOR", "ADMIN"].includes(session.user.role) ? (
-                <Link href="/moderation" className={linkNav}>
-                  Modération
-                </Link>
-              ) : null}
-              {session.user.role === "ADMIN" ? (
-                <Link href="/admin" className={linkNav}>
-                  Admin
-                </Link>
-              ) : null}
+              {canModerate(session.user.role) ? <AdminNavLink /> : null}
               <form
                 action={async () => {
                   "use server";

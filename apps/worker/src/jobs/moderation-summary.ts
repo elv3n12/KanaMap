@@ -17,7 +17,7 @@ export async function sendModerationSummary() {
     await sendEmail(
       moderator.email,
       "Résumé quotidien de modération",
-      `<p>Signalements en attente: ${pendingReports}</p><p>Signalements contestés: ${contestedReports}</p><p>Déclarations d'effets en attente: ${pendingDeclarations}</p><p><a href="${appUrl("/moderation")}">Ouvrir la file de modération</a></p>`,
+      `<p>Signalements en attente: ${pendingReports}</p><p>Signalements contestés: ${contestedReports}</p><p>Déclarations d'effets en attente: ${pendingDeclarations}</p><p><a href="${appUrl("/admin")}">Ouvrir l'interface d'administration</a></p>`,
     );
   }
 
