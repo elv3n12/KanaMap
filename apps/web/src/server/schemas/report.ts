@@ -21,9 +21,9 @@ export const reportSchema = z.object({
   countryName: z.string().trim().min(2),
   city: z.string().trim().min(2),
   district: z.string().trim().optional(),
-  displayZone: z.string().trim().min(2),
-  centroidLat: z.coerce.number().min(-90).max(90),
-  centroidLng: z.coerce.number().min(-180).max(180),
+  displayZone: z.string().trim().optional(),
+  centroidLat: z.coerce.number().min(-90).max(90).optional().or(z.literal("").transform(() => undefined)),
+  centroidLng: z.coerce.number().min(-180).max(180).optional().or(z.literal("").transform(() => undefined)),
   exactAddress: z.string().trim().optional(),
   exactLat: z.coerce.number().optional(),
   exactLng: z.coerce.number().optional(),
@@ -93,12 +93,16 @@ export function formDataArray(formData: FormData, key: string) {
 }
 
 export function parseReportFormData(formData: FormData) {
+  const city = formData.get("city") as string | null;
+  const countryName = formData.get("countryName") as string | null;
+  const displayZone = formData.get("displayZone") || (city && countryName ? `${city}, ${countryName}` : undefined);
+
   return reportSchema.parse({
     countryCode: formData.get("countryCode"),
-    countryName: formData.get("countryName"),
-    city: formData.get("city"),
+    countryName,
+    city,
     district: formData.get("district") || undefined,
-    displayZone: formData.get("displayZone"),
+    displayZone,
     centroidLat: formData.get("centroidLat"),
     centroidLng: formData.get("centroidLng"),
     exactAddress: formData.get("exactAddress") || undefined,

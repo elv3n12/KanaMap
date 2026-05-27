@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { geocodeAddress } from "@/lib/geocode";
 import { scrubPublicText, sanitizeReportInput } from "@/lib/anonymize";
 import { getIpFromRequest, hashIp } from "@/lib/security";
 import { serializePublicReport } from "@/lib/report-serializers";
@@ -38,6 +39,24 @@ export async function POST(request: Request) {
   const parsed = parseReportFormData(formData);
   const sanitized = sanitizeReportInput(parsed);
 
+  let centroidLat = parsed.centroidLat;
+  let centroidLng = parsed.centroidLng;
+
+  if (centroidLat == null || centroidLng == null) {
+    try {
+      const geo = await geocodeAddress(`${parsed.city}, ${parsed.countryName}`);
+      centroidLat = geo.lat;
+      centroidLng = geo.lng;
+    } catch {
+      return NextResponse.json(
+        { error: "Impossible de géolocaliser la ville. Veuillez réessayer." },
+        { status: 422 },
+      );
+    }
+  }
+
+  const displayZone = parsed.displayZone ?? `${parsed.city}, ${parsed.countryName}`;
+
   const location = await db.location.upsert({
     where: {
       countryCode_city_district: {
@@ -48,18 +67,18 @@ export async function POST(request: Request) {
     },
     update: {
       countryName: parsed.countryName,
-      displayZone: parsed.displayZone,
-      centroidLat: parsed.centroidLat,
-      centroidLng: parsed.centroidLng,
+      displayZone,
+      centroidLat,
+      centroidLng,
     },
     create: {
       countryCode: parsed.countryCode,
       countryName: parsed.countryName,
       city: parsed.city,
       district: parsed.district ?? "",
-      displayZone: parsed.displayZone,
-      centroidLat: parsed.centroidLat,
-      centroidLng: parsed.centroidLng,
+      displayZone,
+      centroidLat,
+      centroidLng,
     },
   });
 
