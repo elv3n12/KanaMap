@@ -3,7 +3,7 @@ import { auth, signOut } from "@/auth";
 import { AdminNavLink } from "@/components/admin/admin-nav-link";
 import { branding } from "@/lib/branding";
 import { canModerate } from "@/lib/moderation";
-import { btnNavPill, btnNavPillBlack, linkNav } from "@/lib/ui/button-classes";
+import { btnNavPillBlack, linkNav } from "@/lib/ui/button-classes";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -29,12 +29,6 @@ export async function SiteHeader() {
           </Link>
           {session?.user ? (
             <>
-              <Link href="/signalements/nouveau" className={btnNavPill}>
-                Signaler
-              </Link>
-              <Link href="/declarer-effet-indesirable" className={linkNav}>
-                Effet indésirable
-              </Link>
               <Link href="/compte" className={linkNav}>
                 Compte
               </Link>

@@ -70,6 +70,19 @@ const effects = [
   "autre",
 ];
 
+const positiveEffects = [
+  "détente",
+  "euphorie légère",
+  "rires",
+  "créativité",
+  "concentration",
+  "somnolence agréable",
+  "désinhibition",
+  "stimulation",
+  "sensation corporelle agréable",
+  "autre",
+];
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -96,6 +109,13 @@ async function seedLookups() {
   }
   for (const label of effects) {
     await prisma.adverseEffect.upsert({
+      where: { slug: slugify(label) },
+      update: { label },
+      create: { label, slug: slugify(label) },
+    });
+  }
+  for (const label of positiveEffects) {
+    await prisma.positiveEffect.upsert({
       where: { slug: slugify(label) },
       update: { label },
       create: { label, slug: slugify(label) },

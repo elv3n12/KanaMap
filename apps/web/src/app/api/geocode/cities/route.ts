@@ -10,6 +10,7 @@ type NominatimResult = {
     village?: string;
     municipality?: string;
     state?: string;
+    postcode?: string;
     country?: string;
     country_code?: string;
   };
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
   const cities = results.map((r) => ({
     name: r.address.city || r.address.town || r.address.village || r.address.municipality || r.display_name.split(",")[0],
     state: r.address.state,
+    postcode: r.address.postcode,
     lat: Number(r.lat),
     lng: Number(r.lon),
     displayName: r.display_name,

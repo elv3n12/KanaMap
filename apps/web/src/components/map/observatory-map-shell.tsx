@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { AdverseEffect, Molecule } from "@prisma/client";
 import type { ZonePayload } from "@/lib/report-serializers";
@@ -56,6 +57,16 @@ export function ObservatoryMapShell({ molecules, effects }: Props) {
   return (
     <div className="relative h-[calc(100vh-3.5rem)] min-h-[600px] bg-slate-100">
       <ZoneMap zones={zones} onSelect={setSelectedZone} />
+
+      <Link
+        href="/signalements/nouveau"
+        className="absolute left-4 top-4 z-[900] inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
+      >
+        <span aria-hidden="true" className="text-lg leading-none">
+          +
+        </span>
+        Ajouter un signalement
+      </Link>
 
       {/* Toggle — always visible on the right edge */}
       <button

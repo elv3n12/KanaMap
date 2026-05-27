@@ -805,7 +805,7 @@ Ne jamais coder :
 - bouton “contacter le vendeur” ;
 - bouton “itinéraire” ;
 - classement des meilleurs produits ;
-- avis positifs sur les effets ;
+- mise en avant publique des effets positifs (les effets ressentis sont collectés en modération, pas comme « avis produit ») ;
 - système de recommandation de produits ;
 - système d’alerte “nouveau produit disponible près de vous” ;
 - scraping automatisé de boutiques pour aider à acheter ;

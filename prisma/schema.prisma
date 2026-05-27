@@ -113,6 +113,23 @@ enum ProductStatus {
   ARCHIVED
 }
 
+enum InformationSource {
+  VENDOR
+  POSTER
+  DISPLAY
+  PRODUCT_LABEL
+  WEBSITE
+  WORD_OF_MOUTH
+  OTHER
+}
+
+enum ClaimMatch {
+  EXACT
+  PARTIAL
+  NONE
+  NO_CLAIM_RECEIVED
+}
+
 model User {
   id                  String    @id @default(cuid())
   email               String    @unique
@@ -263,6 +280,18 @@ model AdverseEffect {
   @@map("adverse_effects")
 }
 
+model PositiveEffect {
+  id        String   @id @default(cuid())
+  label     String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  reports ReportPositiveEffect[]
+
+  @@map("positive_effects")
+}
+
 model Report {
   id                  String       @id @default(cuid())
   createdById          String?      @map("created_by_id")
@@ -287,6 +316,18 @@ model Report {
   exactLat             Float?       @map("exact_lat")
   exactLng             Float?       @map("exact_lng")
   publishedAt          DateTime?    @map("published_at")
+  bought               Boolean      @default(false)
+  consumed             Boolean      @default(false)
+  informationSource    InformationSource? @map("information_source")
+  reasonNotBought      String?      @db.Text @map("reason_not_bought")
+  reasonNotConsumed    String?      @db.Text @map("reason_not_consumed")
+  effectsMatchClaim    ClaimMatch?  @map("effects_match_claim")
+  approximatePeriod    String?      @map("approximate_period")
+  effectDuration       String?      @map("effect_duration")
+  withdrawalSymptoms   String?      @db.Text @map("withdrawal_symptoms")
+  medicalCare          Boolean      @default(false) @map("medical_care")
+  wantsContact         Boolean      @default(false) @map("wants_contact")
+  contactEmailEncrypted String?     @db.Text @map("contact_email_encrypted")
   createdAt            DateTime     @default(now()) @map("created_at")
   updatedAt            DateTime     @updatedAt @map("updated_at")
 
@@ -297,6 +338,7 @@ model Report {
   molecules ReportMolecule[]
   marketingClaims ReportMarketingClaim[]
   adverseEffects ReportAdverseEffect[]
+  positiveEffects ReportPositiveEffect[]
   evidence Evidence[]
   moderationActions ModerationAction[]
 
@@ -341,6 +383,18 @@ model ReportAdverseEffect {
   @@id([reportId, effectId])
   @@index([effectId])
   @@map("report_adverse_effects")
+}
+
+model ReportPositiveEffect {
+  reportId String @map("report_id")
+  effectId String @map("effect_id")
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  effect PositiveEffect @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, effectId])
+  @@index([effectId])
+  @@map("report_positive_effects")
 }
 
 model Evidence {
