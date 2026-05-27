@@ -239,6 +239,7 @@ Molécules à prévoir dans la taxonomie initiale :
 - Delta-10-THC ;
 - CBN ;
 - CBG ;
+- Muscimol ;
 - molécule inconnue ;
 - mélange non identifié ;
 - autre.
