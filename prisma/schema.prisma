@@ -64,7 +64,6 @@ enum ReportStatus {
   PUBLISHED_LIMITED
   PUBLISHED
   REJECTED
-  ARCHIVED
   CONTESTED
 }
 
@@ -99,7 +98,7 @@ enum ModerationActionType {
   PUBLISH_LIMITED
   PUBLISH
   REJECT
-  ARCHIVE
+  DELETE
   CONTEST
   MERGE
   NOTE

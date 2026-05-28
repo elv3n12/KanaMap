@@ -73,8 +73,8 @@ export function ReportActions({ reportId }: Props) {
         <button type="button" onClick={() => submit("REJECT")} className={btnDestructive}>
           Rejeter
         </button>
-        <button type="button" onClick={() => submit("ARCHIVE")} className={btnSecondary}>
-          Archiver
+        <button type="button" onClick={() => { if (confirm("Supprimer définitivement ce signalement ?")) submit("DELETE"); }} className={btnDestructive}>
+          Supprimer
         </button>
       </div>
     </div>

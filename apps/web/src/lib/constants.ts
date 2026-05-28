@@ -59,7 +59,6 @@ export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
   PUBLISHED_LIMITED: "Publié en version limitée",
   PUBLISHED: "Publié",
   REJECTED: "Rejeté",
-  ARCHIVED: "Archivé",
   CONTESTED: "Contesté",
 };
 

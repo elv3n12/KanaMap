@@ -70,8 +70,8 @@ export function DeclarationActions({ declarationId }: Props) {
         <button type="button" onClick={() => submit("REJECT")} className={btnDestructive}>
           Rejeter
         </button>
-        <button type="button" onClick={() => submit("ARCHIVE")} className={btnSecondary}>
-          Archiver
+        <button type="button" onClick={() => { if (confirm("Supprimer définitivement cette déclaration ?")) submit("DELETE"); }} className={btnDestructive}>
+          Supprimer
         </button>
       </div>
     </div>

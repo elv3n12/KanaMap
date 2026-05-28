@@ -152,7 +152,7 @@ export const moderationActionSchema = z.object({
     "PUBLISH_LIMITED",
     "PUBLISH",
     "REJECT",
-    "ARCHIVE",
+    "DELETE",
     "CONTEST",
     "NOTE",
   ]),

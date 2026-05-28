@@ -14,8 +14,8 @@ export function actionToStatus(action: ModerationActionType): ReportStatus | nul
       return "PUBLISHED_LIMITED";
     case "REJECT":
       return "REJECTED";
-    case "ARCHIVE":
-      return "ARCHIVED";
+    case "DELETE":
+      return null;
     case "CONTEST":
       return "CONTESTED";
     case "REQUEST_PROOF":

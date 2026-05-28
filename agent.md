@@ -357,7 +357,6 @@ Tout nouveau signalement doit passer par un statut :
 - publié en version limitée ;
 - publié ;
 - rejeté ;
-- archivé ;
 - contesté.
 
 Les modérateurs doivent pouvoir :
@@ -371,7 +370,7 @@ Les modérateurs doivent pouvoir :
 - changer le niveau de preuve ;
 - associer plusieurs signalements au même produit ;
 - associer plusieurs signalements à une même marque ;
-- archiver un produit retiré du marché.
+- supprimer définitivement un signalement (pas d'archivage, suppression irréversible).
 
 Règles de modération impératives :
 
