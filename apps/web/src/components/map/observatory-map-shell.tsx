@@ -4,25 +4,36 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Molecule } from "@prisma/client";
 import type { ZonePayload } from "@/lib/report-serializers";
-import { ZoneFilters } from "@/components/map/zone-filters";
+import { FilterChips, ZoneFilters } from "@/components/map/zone-filters";
 import { ZonePopup } from "@/components/map/zone-popup";
+import { ObsLegend } from "@/components/map/obs-legend";
+import { ObsButton } from "@/components/ui/obs";
 
-const ZoneMap = dynamic(() => import("@/components/map/zone-map").then((mod) => mod.ZoneMap), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full items-center justify-center text-slate-500">Loading map…</div>
-  ),
-});
+const ObservatoryMap = dynamic(
+  () => import("@/components/map/observatory-map").then((mod) => mod.ObservatoryMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center bg-obs-void">
+        <p className="obs-label animate-pulse text-obs-signal">Initializing map…</p>
+      </div>
+    ),
+  },
+);
 
 type Props = {
   molecules: Molecule[];
 };
 
+function hasActiveFilters(filters: Record<string, string>): boolean {
+  return Object.values(filters).some((v) => v.trim() !== "");
+}
+
 export function ObservatoryMapShell({ molecules }: Props) {
   const [zones, setZones] = useState<ZonePayload[]>([]);
   const [selectedZone, setSelectedZone] = useState<ZonePayload | null>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const query = useMemo(() => {
     const params = new URLSearchParams();
@@ -43,49 +54,73 @@ export function ObservatoryMapShell({ molecules }: Props) {
     return () => window.clearTimeout(timeout);
   }, [loadZones]);
 
+  const clearFilters = () => setFilters({});
+
   return (
-    <div className="relative h-[calc(100vh-3.5rem)] min-h-[600px]">
-      <ZoneMap zones={zones} onSelect={setSelectedZone} />
+    <div className="relative h-full min-h-[500px] w-full overflow-hidden bg-obs-void">
+      <ObservatoryMap
+        zones={zones}
+        onSelect={setSelectedZone}
+        selectedZoneId={selectedZone?.locationId ?? null}
+      />
 
-      {/* Top-left: Filter button / panel */}
-      <div className="absolute left-4 top-16 z-[900]">
-        <button
-          type="button"
-          onClick={() => setFiltersOpen((o) => !o)}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-md transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-          aria-expanded={filtersOpen}
-          aria-controls="map-filters-dropdown"
-        >
-          {filtersOpen ? (
-            <>
-              <span aria-hidden="true" className="text-base leading-none">✕</span>
-              Close
-            </>
-          ) : (
-            <>
-              <span aria-hidden="true" className="text-base leading-none">☰</span>
-              Filter
-            </>
-          )}
-        </button>
+      {/* Compact filter toolbar */}
+      <div
+        className={`absolute left-3 top-[7.5rem] z-[900] flex max-w-[calc(100%-1.5rem)] flex-col gap-2 transition-[right] ${
+          selectedZone ? "right-[min(92vw,400px)]" : "right-3"
+        }`}
+      >
+        <div className="obs-panel hidden flex-wrap items-end gap-3 p-3 md:flex">
+          <ZoneFilters molecules={molecules} filters={filters} onChange={setFilters} compact />
+        </div>
 
-        {filtersOpen && (
-          <div
-            id="map-filters-dropdown"
-            className="mt-2 w-56 rounded-xl border border-slate-200 bg-white p-4 shadow-lg"
-          >
+        <div className="obs-panel flex items-center gap-2 p-2 md:hidden">
+          <ObsButton variant="outline" onClick={() => setMobileFiltersOpen((o) => !o)}>
+            {mobileFiltersOpen ? "Close" : "Filter"}
+          </ObsButton>
+          {hasActiveFilters(filters) ? (
+            <ObsButton variant="ghost" onClick={clearFilters}>
+              Clear
+            </ObsButton>
+          ) : null}
+        </div>
+
+        {mobileFiltersOpen ? (
+          <div className="obs-panel p-3 md:hidden">
             <ZoneFilters molecules={molecules} filters={filters} onChange={setFilters} />
           </div>
-        )}
+        ) : null}
+
+        <FilterChips
+          filters={filters}
+          molecules={molecules}
+          onChange={setFilters}
+          onClear={clearFilters}
+        />
       </div>
 
-
-      {/* Top-right: Selected zone panel */}
-      {selectedZone && (
-        <div className="absolute right-4 top-16 z-[900] w-[min(92vw,380px)]">
+      {/* Zone intel panel */}
+      {selectedZone ? (
+        <div className="absolute right-3 top-[7.5rem] z-[900] w-[min(92vw,380px)]">
           <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
         </div>
-      )}
+      ) : null}
+
+      {/* Bottom status bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-[900] border-t border-obs-border bg-obs-void/90 px-4 py-2 backdrop-blur-md">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="obs-data-value text-sm">
+              <span className="obs-label mr-2">Zones</span>
+              {zones.length}
+            </span>
+            {hasActiveFilters(filters) ? (
+              <span className="obs-label text-obs-signal">Filters active</span>
+            ) : null}
+          </div>
+          <ObsLegend />
+        </div>
+      </div>
     </div>
   );
 }

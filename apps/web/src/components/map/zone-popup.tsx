@@ -1,5 +1,7 @@
 import type { ZonePayload } from "@/lib/report-serializers";
 import { PROOF_LEVEL_LABELS } from "@/lib/constants";
+import { ObsBadge, ObsButton, ObsKpi, ObsPanel } from "@/components/ui/obs";
+import { severityHex, severityCount } from "@/lib/map/severity-scale";
 
 type Props = {
   zone: ZonePayload;
@@ -7,79 +9,81 @@ type Props = {
 };
 
 export function ZonePopup({ zone, onClose }: Props) {
+  const severity = severityCount(zone);
+
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-      {/* Header */}
-      <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">{zone.zone}</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            {zone.reportCount} report{zone.reportCount > 1 ? "s" : ""}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-          aria-label="Close"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Body */}
-      <div className="space-y-4 px-5 py-4">
-        {/* Molecules */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Substances</h3>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {zone.molecules.length > 0 ? (
-              zone.molecules.map((mol) => (
-                <span
-                  key={mol}
-                  className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                >
-                  {mol}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-slate-400">Not specified</span>
-            )}
+    <ObsPanel
+      className="obs-glow-violet w-full max-w-[380px]"
+      header={
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="obs-label text-obs-signal">Zone intel</p>
+            <h2 className="mt-1 text-lg font-semibold text-zinc-100">{zone.zone}</h2>
+            <p className="obs-data-value mt-0.5 text-xs text-obs-muted">
+              {zone.countryName}
+              {zone.city ? ` · ${zone.city}` : ""}
+            </p>
           </div>
+          <ObsButton variant="ghost" className="min-h-8 min-w-8 px-2" onClick={onClose} aria-label="Close">
+            ✕
+          </ObsButton>
         </div>
-
-        {/* Adverse effects */}
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Adverse effects</h3>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {zone.adverseEffects.length > 0 ? (
-              zone.adverseEffects.map((eff) => (
-                <span
-                  key={eff}
-                  className="inline-block rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700"
-                >
-                  {eff}
-                </span>
-              ))
-            ) : (
-              <span className="text-xs text-slate-400">None reported</span>
-            )}
-          </div>
-        </div>
-
-        {/* Proof level */}
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-slate-500">Max proof level</span>
-          <span className="font-semibold text-slate-700">{PROOF_LEVEL_LABELS[zone.maxProofLevel]}</span>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="border-t border-slate-100 px-5 py-3">
-        <p className="text-[11px] leading-4 text-slate-400">
+      }
+      footer={
+        <p className="text-[11px] leading-4 text-obs-muted">
           Coordinates intentionally approximated. The observatory documents zones, not access points.
         </p>
+      }
+    >
+      <div className="space-y-4 p-4">
+        <div className="grid grid-cols-2 gap-3">
+          <ObsKpi label="Reports" value={zone.reportCount} />
+          <ObsKpi label="Severity" value={severity} />
+        </div>
+
+        <div>
+          <h3 className="obs-label mb-2">Substances</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {zone.molecules.length > 0 ? (
+              zone.molecules.map((mol) => (
+                <ObsBadge key={mol} tone="signal">
+                  {mol}
+                </ObsBadge>
+              ))
+            ) : (
+              <span className="text-xs text-obs-muted">Not specified</span>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="obs-label mb-2">Adverse effects</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {zone.adverseEffects.length > 0 ? (
+              zone.adverseEffects.map((eff) => (
+                <ObsBadge key={eff} tone="danger">
+                  {eff}
+                </ObsBadge>
+              ))
+            ) : (
+              <span className="text-xs text-obs-muted">None reported</span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-obs-border pt-3">
+          <span className="obs-label">Max proof level</span>
+          <span className="obs-data-value text-sm font-semibold">
+            {PROOF_LEVEL_LABELS[zone.maxProofLevel]}
+          </span>
+        </div>
+
+        <div
+          className="h-1 rounded-full"
+          style={{ background: severityHex(severity), opacity: 0.85 }}
+          aria-hidden
+        />
       </div>
-    </section>
+    </ObsPanel>
   );
 }

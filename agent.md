@@ -234,7 +234,7 @@ Molécules à prévoir dans la taxonomie initiale :
 - 8-OH-HHC ;
 - T9HC ;
 - THV-N10 ;
-- STV10 ;
+- STV-D10 ;
 - Delta-8-THC ;
 - Delta-10-THC ;
 - CBN ;

@@ -1,18 +1,39 @@
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
-@import "leaflet.markercluster/dist/MarkerCluster.css";
-@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+@import "maplibre-gl/dist/maplibre-gl.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --obs-void: #050506;
+  --obs-surface: #0c0c0f;
+  --obs-elevated: #141418;
+  --obs-border: #2a2a32;
+  --obs-border-accent: rgba(124, 58, 237, 0.4);
+  --obs-violet: #8b5cf6;
+  --obs-violet-dim: #5b21b6;
+  --obs-signal: #a78bfa;
+  --obs-danger: #dc2626;
+  --obs-warning: #f59e0b;
+  --obs-success: #10b981;
+  --obs-muted: #71717a;
+  --background: var(--obs-void);
+  --foreground: #f4f4f5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-obs-void: var(--obs-void);
+  --color-obs-surface: var(--obs-surface);
+  --color-obs-elevated: var(--obs-elevated);
+  --color-obs-border: var(--obs-border);
+  --color-obs-violet: var(--obs-violet);
+  --color-obs-violet-dim: var(--obs-violet-dim);
+  --color-obs-signal: var(--obs-signal);
+  --color-obs-danger: var(--obs-danger);
+  --color-obs-warning: var(--obs-warning);
+  --color-obs-success: var(--obs-success);
+  --color-obs-muted: var(--obs-muted);
+  --font-sans: var(--font-ibm-plex-sans);
+  --font-mono: var(--font-ibm-plex-mono);
 }
 
 @layer base {
@@ -32,28 +53,86 @@
     [role="button"],
     input[type="submit"],
     input[type="button"],
-    a {
+    a,
+    .obs-pulse {
       transition: none !important;
+      animation: none !important;
     }
   }
 
   input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea {
-    @apply border-slate-300 text-slate-900;
+    @apply border-obs-border bg-obs-elevated text-zinc-100;
   }
 
   input:not([type="checkbox"]):not([type="radio"]):focus-visible,
   select:focus-visible,
   textarea:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+    box-shadow: 0 0 0 2px var(--obs-void), 0 0 0 4px var(--obs-violet);
   }
 }
 
 body {
-  background: var(--background);
+  background: var(--obs-void);
   color: var(--foreground);
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
+
+.obs-panel {
+  border: 1px solid var(--obs-border);
+  background: color-mix(in srgb, var(--obs-surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-radius: 6px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 4%, transparent),
+    0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.obs-grid-bg {
+  background-color: var(--obs-void);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--obs-border) 35%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--obs-border) 35%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.obs-glow-violet {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--obs-violet) 30%, transparent),
+    0 0 24px color-mix(in srgb, var(--obs-violet) 25%, transparent);
+}
+
+.obs-label {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--obs-muted);
+}
+
+.obs-data-value {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  color: #f4f4f5;
+}
+
+.obs-pulse {
+  animation: obs-pulse 2s ease-in-out infinite;
+}
+
+@keyframes obs-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
 }
 
 .skip-link {
@@ -86,20 +165,50 @@ body {
   height: auto;
   overflow: visible;
   padding: 0.75rem 1rem;
-  background: #000;
+  background: var(--obs-elevated);
   color: #fff;
   font-weight: 600;
-  border-radius: 0.5rem;
-  outline: 3px solid #2563eb;
+  border-radius: 4px;
+  outline: 3px solid var(--obs-violet);
   outline-offset: 2px;
 }
 
-.leaflet-container {
-  width: 100%;
-  height: 100%;
+/* MapLibre HUD chrome */
+.maplibregl-map {
   font-family: inherit;
 }
 
-.leaflet-popup-content-wrapper {
-  border-radius: 14px;
+.maplibregl-ctrl-attrib {
+  background: color-mix(in srgb, var(--obs-surface) 90%, transparent) !important;
+  color: var(--obs-muted) !important;
+  font-size: 10px !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--obs-signal) !important;
+}
+
+.obs-map-nav button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--obs-border);
+  background: color-mix(in srgb, var(--obs-surface) 92%, transparent);
+  color: #e4e4e7;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.obs-map-nav button:hover {
+  border-color: var(--obs-violet);
+  color: var(--obs-signal);
+}
+
+.obs-map-nav button:focus-visible {
+  outline: 2px solid var(--obs-violet);
+  outline-offset: 2px;
 }

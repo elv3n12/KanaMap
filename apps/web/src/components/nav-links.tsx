@@ -29,16 +29,16 @@ export function NavLinks({ items, isAdmin }: Props) {
           <Link
             key={item.href}
             href={item.href}
-            className={`inline-flex items-center px-3 py-1.5 text-sm font-bold transition-colors ${
+            className={`relative inline-flex min-h-9 items-center px-2.5 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 ${
               isActive
-                ? "rounded-full bg-slate-100 text-black"
-                : "text-black hover:text-emerald-600 hover:underline underline-offset-4 active:text-black active:underline"
+                ? "text-obs-signal after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:bg-obs-violet"
+                : "text-zinc-400 hover:text-zinc-100"
             }`}
           >
             {item.label}
             {item.badge && badge > 0 ? (
               <span
-                className="ml-1.5 inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-rose-600 px-1.5 py-0.5 text-xs font-semibold text-white"
+                className="ml-1.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-amber-600 px-1.5 py-0.5 text-[10px] font-semibold text-obs-void"
                 aria-label={`${badge} item(s) to review`}
               >
                 {badge > 99 ? "99+" : badge}

@@ -133,10 +133,12 @@ export function MoleculeAutocomplete({
 
   return (
     <div ref={rootRef}>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-800">
-        {label}
-      </label>
-      <div className="mt-1 rounded-lg border border-slate-300 bg-white">
+      {label ? (
+        <label htmlFor={id} className="obs-label mb-1 block">
+          {label}
+        </label>
+      ) : null}
+      <div className="rounded border border-obs-border bg-obs-elevated">
         <input
           ref={inputRef}
           id={id}
@@ -154,7 +156,7 @@ export function MoleculeAutocomplete({
             }
           }}
           placeholder={placeholder ?? (singleSelect ? "Search for a molecule…" : "Add molecules…")}
-          className="min-h-11 w-full rounded-lg bg-white p-3 text-slate-900 outline-none"
+          className="min-h-9 w-full rounded bg-transparent p-2 text-sm text-zinc-100 placeholder:text-obs-muted outline-none"
           autoComplete="off"
         />
       </div>
@@ -164,13 +166,13 @@ export function MoleculeAutocomplete({
           {pills.map((pill) => (
             <span
               key={pill.key}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-800"
+              className="inline-flex items-center gap-2 rounded border border-obs-border bg-obs-elevated px-2 py-0.5 text-xs font-medium text-obs-signal"
             >
               {pill.label}
               <button
                 type="button"
                 onClick={pill.onRemove}
-                className="rounded-full px-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700"
+                className="rounded px-1 text-obs-muted hover:text-zinc-200"
                 aria-label={`Remove ${pill.label}`}
               >
                 ✕
@@ -182,11 +184,11 @@ export function MoleculeAutocomplete({
 
       {open ? (
         <div className="relative">
-          <div className="absolute z-[1000] mt-2 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+          <div className="obs-panel absolute z-[1000] mt-2 max-h-64 w-full overflow-auto">
             {canAddCustom ? (
               <button
                 type="button"
-                className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-50"
+                className="block w-full px-4 py-2 text-left text-sm text-zinc-200 hover:bg-obs-elevated"
                 onClick={() => addCustom(canAddCustom)}
               >
                 Add &quot;{canAddCustom}&quot;
@@ -196,7 +198,7 @@ export function MoleculeAutocomplete({
               <button
                 key={opt.id}
                 type="button"
-                className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-50"
+                className="block w-full px-4 py-2 text-left text-sm text-zinc-200 hover:bg-obs-elevated disabled:opacity-40"
                 onClick={() => addId(opt.id)}
                 disabled={singleSelect ? false : selectedIdSet.has(opt.id)}
               >
@@ -204,7 +206,7 @@ export function MoleculeAutocomplete({
               </button>
             ))}
             {matches.length === 0 && !canAddCustom ? (
-              <p className="px-4 py-3 text-sm text-slate-600">No results.</p>
+              <p className="px-4 py-3 text-sm text-obs-muted">No results.</p>
             ) : null}
           </div>
         </div>

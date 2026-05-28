@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { AgeGate } from "@/components/age-gate";
 import { RiskBanner } from "@/components/risk-banner";
 import { SiteHeader } from "@/components/site-header";
 import { branding } from "@/lib/branding";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -29,17 +31,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-zinc-50 text-zinc-950">
+      <body className="min-h-full bg-obs-void font-sans text-zinc-100">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
         <SiteHeader />
-        <main id="main-content" className="min-h-screen pb-20 pt-14" tabIndex={-1}>
+        <RiskBanner />
+        <main id="main-content" className="min-h-screen pt-14" tabIndex={-1}>
           {children}
         </main>
-        <RiskBanner />
         <AgeGate />
       </body>
     </html>
