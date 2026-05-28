@@ -80,9 +80,9 @@ export function ObservatoryMapShell({ molecules }: Props) {
       </div>
 
 
-      {/* Bottom-left: Selected zone panel */}
+      {/* Top-right: Selected zone panel */}
       {selectedZone && (
-        <div className="absolute bottom-4 left-4 z-[900] w-[min(92vw,380px)]">
+        <div className="absolute right-4 top-16 z-[900] w-[min(92vw,380px)]">
           <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
         </div>
       )}
