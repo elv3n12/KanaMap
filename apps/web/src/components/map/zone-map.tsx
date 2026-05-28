@@ -2,39 +2,62 @@
 
 import { useEffect } from "react";
 import L from "leaflet";
-import "leaflet.markercluster";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import type { ZonePayload } from "@/lib/report-serializers";
-import { PROOF_LEVEL_LABELS } from "@/lib/constants";
 
 type Props = {
   zones: ZonePayload[];
   onSelect: (zone: ZonePayload) => void;
 };
 
-const icon = L.divIcon({
-  className: "",
-  html: '<div class="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-slate-900 text-xs font-bold text-white shadow-lg">OBS</div>',
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-});
+function severityColor(adverseEffectCount: number): string {
+  const t = Math.min(adverseEffectCount / 6, 1);
+  const r = Math.round(34 + t * (220 - 34));
+  const g = Math.round(197 - t * (197 - 38));
+  const b = Math.round(94 - t * (94 - 38));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function circleRadius(moleculeCount: number): number {
+  const base = 8;
+  const scaled = base + Math.sqrt(moleculeCount) * 6;
+  return Math.min(scaled, 40);
+}
 
 function ClusteredZones({ zones, onSelect }: Props) {
   const map = useMap();
 
   useEffect(() => {
-    const cluster = L.markerClusterGroup();
+    const layers: L.CircleMarker[] = [];
+
     for (const zone of zones) {
-      const marker = L.marker([zone.centroidLat, zone.centroidLng], { icon });
-      marker.bindPopup(
-        `<strong>Zone : ${escapeHtml(zone.zone)}</strong><br>Signalements : ${zone.reportCount}<br>Niveau de preuve maximal : ${escapeHtml(PROOF_LEVEL_LABELS[zone.maxProofLevel])}`,
+      const radius = circleRadius(zone.molecules.length);
+      const color = severityColor(zone.adverseEffects.length);
+
+      const circle = L.circleMarker([zone.centroidLat, zone.centroidLng], {
+        radius,
+        color,
+        fillColor: color,
+        fillOpacity: 0.55,
+        weight: 2,
+        opacity: 0.9,
+      });
+
+      circle.bindPopup(
+        `<strong>${escapeHtml(zone.zone)}</strong><br>` +
+          `Signalements : ${zone.reportCount}<br>` +
+          `Substances : ${zone.molecules.length}<br>` +
+          `Effets négatifs : ${zone.adverseEffects.length}`,
       );
-      marker.on("click", () => onSelect(zone));
-      cluster.addLayer(marker);
+      circle.on("click", () => onSelect(zone));
+      circle.addTo(map);
+      layers.push(circle);
     }
-    map.addLayer(cluster);
+
     return () => {
-      map.removeLayer(cluster);
+      for (const layer of layers) {
+        map.removeLayer(layer);
+      }
     };
   }, [map, onSelect, zones]);
 
