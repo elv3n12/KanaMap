@@ -8,3 +8,4 @@ backups
 uploads
 .env
 .env*
+.env.old
