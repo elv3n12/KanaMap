@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ReportActions } from "@/components/moderation/report-actions";
 import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, PROOF_LEVEL_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
+import { decryptPII } from "@/lib/crypto";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -57,11 +58,7 @@ export default async function AdminSignalementDetailPage({ params }: Props) {
             />
             <Info
               label="Adresse modération"
-              value={
-                report.exactAddressEncrypted
-                  ? Buffer.from(report.exactAddressEncrypted, "base64").toString("utf8")
-                  : "Non fournie ou masquée"
-              }
+              value={decryptPII(report.exactAddressEncrypted) ?? "Non fournie ou masquée"}
             />
           </dl>
           {report.narrative ? <p className="mt-6 whitespace-pre-line leading-7 text-slate-700">{report.narrative}</p> : null}

@@ -1,9 +1,13 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { geocodeAddress } from "@/lib/geocode";
 import { scrubPublicText, sanitizeReportInput } from "@/lib/anonymize";
 import { getIpFromRequest, hashIp } from "@/lib/security";
+import { encryptPII } from "@/lib/crypto";
+import { rateLimit, RateLimitPolicies } from "@/lib/rate-limit";
 import { serializePublicReport } from "@/lib/report-serializers";
 import {
   buildReportNarrative,
@@ -22,6 +26,42 @@ function slugify(value: string) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+async function validateCatalogIds(input: {
+  moleculeIds: string[];
+  marketingClaimIds: string[];
+  adverseEffectIds: string[];
+  positiveEffectIds: string[];
+}): Promise<string[]> {
+  const unique = {
+    molecule: Array.from(new Set(input.moleculeIds.filter(Boolean))),
+    marketingClaim: Array.from(new Set(input.marketingClaimIds.filter(Boolean))),
+    adverseEffect: Array.from(new Set(input.adverseEffectIds.filter(Boolean))),
+    positiveEffect: Array.from(new Set(input.positiveEffectIds.filter(Boolean))),
+  };
+
+  const [moleculeCount, claimCount, adverseCount, positiveCount] = await Promise.all([
+    unique.molecule.length
+      ? db.molecule.count({ where: { id: { in: unique.molecule } } })
+      : Promise.resolve(0),
+    unique.marketingClaim.length
+      ? db.marketingClaim.count({ where: { id: { in: unique.marketingClaim } } })
+      : Promise.resolve(0),
+    unique.adverseEffect.length
+      ? db.adverseEffect.count({ where: { id: { in: unique.adverseEffect } } })
+      : Promise.resolve(0),
+    unique.positiveEffect.length
+      ? db.positiveEffect.count({ where: { id: { in: unique.positiveEffect } } })
+      : Promise.resolve(0),
+  ]);
+
+  const invalid: string[] = [];
+  if (moleculeCount !== unique.molecule.length) invalid.push("moleculeIds");
+  if (claimCount !== unique.marketingClaim.length) invalid.push("marketingClaimIds");
+  if (adverseCount !== unique.adverseEffect.length) invalid.push("adverseEffectIds");
+  if (positiveCount !== unique.positiveEffect.length) invalid.push("positiveEffectIds");
+  return invalid;
 }
 
 async function ensureMoleculesByName(names: string[]) {
@@ -50,15 +90,19 @@ async function ensureMoleculesByName(names: string[]) {
   }
   if (toCreate.length === 0) return ids;
 
-  for (const name of toCreate) {
-    const created = await db.molecule.upsert({
-      where: { slug: slugify(name) },
-      update: { name },
-      create: { name, slug: slugify(name) },
-      select: { id: true },
-    });
-    ids.push(created.id);
-  }
+  // Batch upserts in a single transaction: bounded by reportSchema max(10) per list,
+  // so this is at most 20 round-trips per request (down from N sequential awaits).
+  const created = await db.$transaction(
+    toCreate.map((name) =>
+      db.molecule.upsert({
+        where: { slug: slugify(name) },
+        update: { name },
+        create: { name, slug: slugify(name) },
+        select: { id: true },
+      }),
+    ),
+  );
+  for (const row of created) ids.push(row.id);
 
   return ids;
 }
@@ -90,127 +134,190 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Connexion requise" }, { status: 401 });
   }
 
-  const contentType = request.headers.get("content-type") ?? "";
-  const parsed =
-    contentType.includes("application/json")
+  const limit = rateLimit(`report:${session.user.id}`, RateLimitPolicies.reportSubmit);
+  if (!limit.success) {
+    return NextResponse.json(
+      { error: "Trop de signalements envoyés récemment. Réessayez plus tard." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(limit.retryAfterSec),
+          "X-RateLimit-Reset": String(Math.floor(limit.resetAt / 1000)),
+        },
+      },
+    );
+  }
+
+  try {
+    const contentType = request.headers.get("content-type") ?? "";
+    const parsed = contentType.includes("application/json")
       ? parseReportJson(await request.json())
       : parseReportFormData(await request.formData());
 
-  const sanitized = sanitizeReportInput(parsed);
+    const sanitized = sanitizeReportInput(parsed);
 
-  const [announcedFromNames, suspectedFromNames] = await Promise.all([
-    ensureMoleculesByName(parsed.announcedMoleculeNames ?? []),
-    ensureMoleculesByName(parsed.suspectedMoleculeNames ?? []),
-  ]);
-  const announcedIds = Array.from(new Set([...(parsed.announcedMoleculeIds ?? []), ...announcedFromNames]));
-  const suspectedIds = Array.from(new Set([...(parsed.suspectedMoleculeIds ?? []), ...suspectedFromNames]));
+    const [announcedFromNames, suspectedFromNames] = await Promise.all([
+      ensureMoleculesByName(parsed.announcedMoleculeNames ?? []),
+      ensureMoleculesByName(parsed.suspectedMoleculeNames ?? []),
+    ]);
+    const announcedIds = Array.from(
+      new Set([...(parsed.announcedMoleculeIds ?? []), ...announcedFromNames]),
+    );
+    const suspectedIds = Array.from(
+      new Set([...(parsed.suspectedMoleculeIds ?? []), ...suspectedFromNames]),
+    );
 
-  let centroidLat = parsed.centroidLat;
-  let centroidLng = parsed.centroidLng;
-
-  if (centroidLat == null || centroidLng == null) {
-    try {
-      const geo = await geocodeAddress(`${parsed.city}, ${parsed.countryName}`);
-      centroidLat = geo.lat;
-      centroidLng = geo.lng;
-    } catch {
+    const invalidCatalogFields = await validateCatalogIds({
+      moleculeIds: [...announcedIds, ...suspectedIds],
+      marketingClaimIds: parsed.marketingClaimIds,
+      adverseEffectIds: parsed.adverseEffectIds,
+      positiveEffectIds: parsed.positiveEffectIds,
+    });
+    if (invalidCatalogFields.length > 0) {
       return NextResponse.json(
-        { error: "Impossible de géolocaliser la ville. Veuillez réessayer." },
+        {
+          error: "Identifiants inconnus dans le catalogue.",
+          invalid: invalidCatalogFields,
+        },
         { status: 422 },
       );
     }
-  }
 
-  const displayZone = parsed.displayZone ?? `${parsed.city}, ${parsed.countryName}`;
-  const narrative = buildReportNarrative(parsed);
+    let centroidLat = parsed.centroidLat;
+    let centroidLng = parsed.centroidLng;
 
-  const location = await db.location.upsert({
-    where: {
-      countryCode_city_district: {
-        countryCode: parsed.countryCode,
-        city: parsed.city,
-        district: parsed.district ?? "",
-      },
-    },
-    update: {
-      countryName: parsed.countryName,
-      displayZone,
-      centroidLat,
-      centroidLng,
-    },
-    create: {
-      countryCode: parsed.countryCode,
-      countryName: parsed.countryName,
-      city: parsed.city,
-      district: parsed.district ?? "",
-      displayZone,
-      centroidLat,
-      centroidLng,
-    },
-  });
+    if (centroidLat == null || centroidLng == null) {
+      try {
+        const geo = await geocodeAddress(`${parsed.city}, ${parsed.countryName}`);
+        centroidLat = geo.lat;
+        centroidLng = geo.lng;
+      } catch {
+        return NextResponse.json(
+          { error: "Impossible de géolocaliser la ville. Veuillez réessayer." },
+          { status: 422 },
+        );
+      }
+    }
 
-  const report = await db.report.create({
-    data: {
-      createdById: session.user.id,
-      locationId: location.id,
-      placeType: parsed.placeType,
-      placeOtherLabel: scrubPublicText(parsed.placeOtherLabel),
-      brandRawName: scrubPublicText(parsed.brandRawName),
-      productCommercialName: scrubPublicText(parsed.productCommercialName),
-      productType: parsed.productType,
-      productOtherLabel: scrubPublicText(parsed.productOtherLabel),
-      formOfUse: parsed.consumed ? parsed.formOfUse : undefined,
-      quantityObserved: parsed.quantityObserved,
-      priceObserved: parsed.priceObserved,
-      priceMode: parsed.priceMode,
-      observationDate: parsed.observationDate,
-      narrative: scrubPublicText(narrative),
-      moderationStatus: "PUBLISHED",
-      publishedAt: new Date(),
-      proofLevel: parsed.proofLevel,
-      exactAddressEncrypted: sanitized.exactAddress ? Buffer.from(sanitized.exactAddress).toString("base64") : null,
-      exactLat: sanitized.exactLat,
-      exactLng: sanitized.exactLng,
-      bought: parsed.bought,
-      consumed: parsed.consumed,
-      informationSource: parsed.informationSource,
-      reasonNotBought: scrubPublicText(parsed.reasonNotBought),
-      reasonNotConsumed: scrubPublicText(parsed.reasonNotConsumed),
-      effectsMatchClaim: parsed.consumed ? parsed.effectsMatchClaim : undefined,
-      approximatePeriod: scrubPublicText(parsed.approximatePeriod),
-      effectDuration: scrubPublicText(parsed.effectDuration),
-      withdrawalSymptoms: scrubPublicText(parsed.withdrawalSymptoms),
-      medicalCare: parsed.medicalCare,
-      wantsContact: parsed.wantsContact,
-      contactEmailEncrypted:
-        parsed.wantsContact && parsed.contactEmail
-          ? Buffer.from(parsed.contactEmail).toString("base64")
-          : null,
-      molecules: { create: moleculeConnections(announcedIds, suspectedIds) },
-      marketingClaims: { create: parsed.marketingClaimIds.map((claimId) => ({ claimId })) },
-      adverseEffects: { create: parsed.adverseEffectIds.map((effectId) => ({ effectId })) },
-      positiveEffects: { create: parsed.positiveEffectIds.map((effectId) => ({ effectId })) },
-      moderationActions: {
-        create: {
-          moderatorId: session.user.id,
-          action: "SUBMIT",
-          afterStatus: "PUBLISHED",
-          notes: "Signalement publié à la soumission (modération a posteriori).",
+    const displayZone = parsed.displayZone ?? `${parsed.city}, ${parsed.countryName}`;
+    const narrative = buildReportNarrative(parsed);
+
+    const location = await db.location.upsert({
+      where: {
+        countryCode_city_district: {
+          countryCode: parsed.countryCode,
+          city: parsed.city,
+          district: parsed.district ?? "",
         },
       },
-    },
-    include: includeReport,
-  });
+      update: {
+        countryName: parsed.countryName,
+        displayZone,
+        centroidLat,
+        centroidLng,
+      },
+      create: {
+        countryCode: parsed.countryCode,
+        countryName: parsed.countryName,
+        city: parsed.city,
+        district: parsed.district ?? "",
+        displayZone,
+        centroidLat,
+        centroidLng,
+      },
+    });
 
-  await db.auditLog.create({
-    data: {
-      userId: session.user.id,
-      ipHash: hashIp(getIpFromRequest(request)),
-      action: "report.submit",
-      targetType: "report",
-      targetId: report.id,
-    },
-  });
+    const report = await db.report.create({
+      data: {
+        createdById: session.user.id,
+        locationId: location.id,
+        placeType: parsed.placeType,
+        placeOtherLabel: scrubPublicText(parsed.placeOtherLabel),
+        brandRawName: scrubPublicText(parsed.brandRawName),
+        productCommercialName: scrubPublicText(parsed.productCommercialName),
+        productType: parsed.productType,
+        productOtherLabel: scrubPublicText(parsed.productOtherLabel),
+        formOfUse: parsed.consumed ? parsed.formOfUse : undefined,
+        quantityObserved: parsed.quantityObserved,
+        priceObserved: parsed.priceObserved,
+        priceMode: parsed.priceMode,
+        observationDate: parsed.observationDate,
+        narrative: scrubPublicText(narrative),
+        moderationStatus: "PUBLISHED",
+        publishedAt: new Date(),
+        proofLevel: parsed.proofLevel,
+        exactAddressEncrypted: sanitized.exactAddress ? encryptPII(sanitized.exactAddress) : null,
+        exactLat: sanitized.exactLat,
+        exactLng: sanitized.exactLng,
+        bought: parsed.bought,
+        consumed: parsed.consumed,
+        informationSource: parsed.informationSource,
+        reasonNotBought: scrubPublicText(parsed.reasonNotBought),
+        reasonNotConsumed: scrubPublicText(parsed.reasonNotConsumed),
+        effectsMatchClaim: parsed.consumed ? parsed.effectsMatchClaim : undefined,
+        approximatePeriod: scrubPublicText(parsed.approximatePeriod),
+        effectDuration: scrubPublicText(parsed.effectDuration),
+        withdrawalSymptoms: scrubPublicText(parsed.withdrawalSymptoms),
+        medicalCare: parsed.medicalCare,
+        wantsContact: parsed.wantsContact,
+        contactEmailEncrypted:
+          parsed.wantsContact && parsed.contactEmail ? encryptPII(parsed.contactEmail) : null,
+        molecules: { create: moleculeConnections(announcedIds, suspectedIds) },
+        marketingClaims: { create: parsed.marketingClaimIds.map((claimId) => ({ claimId })) },
+        adverseEffects: { create: parsed.adverseEffectIds.map((effectId) => ({ effectId })) },
+        positiveEffects: { create: parsed.positiveEffectIds.map((effectId) => ({ effectId })) },
+        moderationActions: {
+          create: {
+            moderatorId: session.user.id,
+            action: "SUBMIT",
+            afterStatus: "PUBLISHED",
+            notes: "Signalement publié à la soumission (modération a posteriori).",
+          },
+        },
+      },
+      include: includeReport,
+    });
 
-  return NextResponse.json({ report: serializePublicReport(report), consumed: parsed.consumed }, { status: 201 });
+    await db.auditLog.create({
+      data: {
+        userId: session.user.id,
+        ipHash: hashIp(getIpFromRequest(request)),
+        action: "report.submit",
+        targetType: "report",
+        targetId: report.id,
+      },
+    });
+
+    return NextResponse.json(
+      { report: serializePublicReport(report), consumed: parsed.consumed },
+      { status: 201 },
+    );
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation invalide.", issues: err.flatten() },
+        { status: 422 },
+      );
+    }
+
+    const errorId = randomUUID();
+    console.error(`[report.submit ${errorId}]`, err);
+    try {
+      await db.auditLog.create({
+        data: {
+          userId: session.user.id,
+          ipHash: hashIp(getIpFromRequest(request)),
+          action: "report.submit.error",
+          targetType: "report",
+          targetId: errorId,
+        },
+      });
+    } catch (auditErr) {
+      console.error(`[report.submit ${errorId}] failed to write audit log`, auditErr);
+    }
+    return NextResponse.json(
+      { error: "Erreur interne. Réessayez plus tard.", errorId },
+      { status: 500 },
+    );
+  }
 }
