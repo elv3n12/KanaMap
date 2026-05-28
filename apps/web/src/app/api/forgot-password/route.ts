@@ -22,10 +22,10 @@ export async function POST(request: Request) {
     });
     await sendEmail({
       to: user.email,
-      subject: "Réinitialisation du mot de passe Cannabinoid Observatory Europe",
-      html: `<p><a href="${appUrl(`/reinitialiser/${rawToken}`)}">Réinitialiser mon mot de passe</a></p><p>Ce lien expire dans 30 minutes.</p>`,
+      subject: "Password reset - Cannabinoid Observatory Europe",
+      html: `<p><a href="${appUrl(`/reset-password/${rawToken}`)}">Reset my password</a></p><p>This link expires in 30 minutes.</p>`,
     });
   }
 
-  return NextResponse.redirect(new URL("/mot-de-passe-oublie?sent=1", request.url));
+  return NextResponse.redirect(new URL("/forgot-password?sent=1", request.url));
 }

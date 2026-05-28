@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: branding.appName,
-  description: branding.taglineFr,
+  description: branding.tagline,
 };
 
 export default function RootLayout({
@@ -28,12 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fr"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-zinc-50 text-zinc-950">
         <a href="#main-content" className="skip-link">
-          Aller au contenu principal
+          Skip to main content
         </a>
         <SiteHeader />
         <main id="main-content" className="min-h-screen pb-20 pt-14" tabIndex={-1}>

@@ -7,15 +7,15 @@ export default function ContactPage() {
       <h1 className="text-3xl font-semibold">Contact</h1>
       <div className="mt-6 space-y-4 rounded-2xl bg-white p-6 leading-7 text-slate-800 shadow-sm">
         <p>
-          Vous souhaitez nous écrire, signaler une erreur, proposer une collaboration ou demander des
-          précisions sur la méthodologie ? Utilisez le formulaire ci-dessous.
+          Want to write to us, report an error, propose a collaboration, or ask questions about
+          our methodology? Use the form below.
         </p>
         <p>
-          L&apos;observatoire documente les zones concernées, molécules signalées, formes commerciales,
-          allégations marketing, niveaux de preuve et effets indésirables rapportés.
+          The observatory documents affected zones, reported molecules, commercial forms,
+          marketing claims, proof levels, and reported adverse effects.
         </p>
         <p>
-          Les exports publics sont anonymisés. Les données sensibles restent réservées à la modération.
+          Public exports are anonymized. Sensitive data remains reserved for moderation.
         </p>
       </div>
       <form action={contactAction} className="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm">
@@ -45,7 +45,7 @@ export default function ContactPage() {
           />
         </div>
         <button className={btnPrimary} type="submit">
-          Envoyer
+          Send
         </button>
       </form>
     </div>

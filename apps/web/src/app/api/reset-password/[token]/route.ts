@@ -17,7 +17,7 @@ export async function POST(request: Request, { params }: Params) {
   });
 
   if (!record || record.usedAt || record.expiresAt < new Date()) {
-    return NextResponse.redirect(new URL("/mot-de-passe-oublie?invalid=1", request.url));
+    return NextResponse.redirect(new URL("/forgot-password?invalid=1", request.url));
   }
 
   await db.$transaction([
@@ -31,5 +31,5 @@ export async function POST(request: Request, { params }: Params) {
     }),
   ]);
 
-  return NextResponse.redirect(new URL("/connexion?reset=1", request.url));
+  return NextResponse.redirect(new URL("/login?reset=1", request.url));
 }

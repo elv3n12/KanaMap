@@ -59,11 +59,11 @@ export function ZoneFilters({ molecules, filters, onChange }: Props) {
     <div className="grid gap-3">
       <FilterSelect
         id="filter-place"
-        label="Type de lieu"
+        label="Place type"
         value={filters.placeType ?? ""}
         onChange={(v) => set("placeType", v)}
       >
-        <option value="">Tous les lieux</option>
+        <option value="">All places</option>
         {Object.entries(PLACE_TYPE_LABELS).map(([value, label]) => (
           <option key={value} value={value}>
             {label}
@@ -72,7 +72,7 @@ export function ZoneFilters({ molecules, filters, onChange }: Props) {
       </FilterSelect>
       <MoleculeAutocomplete
         id="filter-molecule"
-        label="Molécule"
+        label="Molecule"
         options={molecules.map((m) => ({ id: m.id, name: m.name }))}
         selectedIds={selectedIds}
         selectedCustomNames={selectedNames}
@@ -80,7 +80,7 @@ export function ZoneFilters({ molecules, filters, onChange }: Props) {
           set("moleculeIds", ids.join(","));
           set("moleculeNames", customNames.join(","));
         }}
-        placeholder="Rechercher une molécule…"
+        placeholder="Search for a molecule…"
       />
     </div>
   );

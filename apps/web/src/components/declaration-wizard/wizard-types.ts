@@ -132,55 +132,55 @@ export function getStepSequence(data: DeclarationData): WizardStepId[] {
 
 export const STEP_TITLES: Record<WizardStepId, { title: string; subtitle: string }> = {
   location: {
-    title: "Où avez-vous observé ce point de vente ?",
-    subtitle: "Indiquez le pays, la ville et le type de commerce. Aucune adresse exacte n’est demandée.",
+    title: "Where did you observe this point of sale?",
+    subtitle: "Indicate the country, city, and type of business. No exact address is required.",
   },
   product: {
-    title: "Quel produit avez-vous observé ?",
-    subtitle: "Marque, nom commercial et type de produit tels qu’affichés ou annoncés.",
+    title: "What product did you observe?",
+    subtitle: "Brand, commercial name, and product type as displayed or advertised.",
   },
   substance: {
-    title: "Substance active et source d’information",
-    subtitle: "Ce que le vendeur ou le support commercial a indiqué.",
+    title: "Active substance and source of information",
+    subtitle: "What the seller or commercial materials indicated.",
   },
   purchase: {
-    title: "Avez-vous acheté ce produit ?",
-    subtitle: "Cette information aide à comprendre le parcours d’exposition.",
+    title: "Did you purchase this product?",
+    subtitle: "This information helps understand the exposure pathway.",
   },
   consumption: {
-    title: "Avez-vous consommé ce produit ?",
-    subtitle: "Si oui, nous vous poserons quelques questions sur les effets ressentis.",
+    title: "Did you consume this product?",
+    subtitle: "If yes, we will ask you a few questions about the effects experienced.",
   },
   formOfUse: {
-    title: "Comment avez-vous consommé ?",
-    subtitle: "Forme d’usage et période approximative.",
+    title: "How did you consume?",
+    subtitle: "Form of use and approximate period.",
   },
   positiveEffects: {
-    title: "Effets ressentis comme positifs",
-    subtitle: "Sélectionnez tout ce qui s’applique, ou précisez autre chose.",
+    title: "Effects perceived as positive",
+    subtitle: "Select all that apply, or specify something else.",
   },
   negativeEffects: {
-    title: "Effets indésirables ou négatifs",
-    subtitle: "Cochez les symptômes ressentis. En cas de malaise actuel, les numéros d’urgence figurent à la fin.",
+    title: "Adverse or negative effects",
+    subtitle: "Check the symptoms experienced. Emergency numbers are provided at the end if you are currently unwell.",
   },
   claimMatch: {
-    title: "Les effets correspondaient-ils aux promesses ?",
-    subtitle: "Par rapport à ce que le vendeur ou l’emballage annonçait.",
+    title: "Did the effects match the claims?",
+    subtitle: "Compared to what the seller or packaging advertised.",
   },
   evidence: {
-    title: "Compléments et niveau de preuve",
-    subtitle: "Récit libre, date d’observation déjà renseignée, et éléments dont vous disposez.",
+    title: "Additional details and proof level",
+    subtitle: "Free narrative, observation date already entered, and evidence you have.",
   },
   contact: {
-    title: "Souhaitez-vous être recontacté ?",
-    subtitle: "Facultatif. Votre email reste réservé à la modération.",
+    title: "Would you like to be contacted?",
+    subtitle: "Optional. Your email is only shared with moderation.",
   },
   review: {
-    title: "Vérifiez votre déclaration",
-    subtitle: "Relisez les informations avant envoi.",
+    title: "Review your report",
+    subtitle: "Read through the information before submitting.",
   },
   confirmation: {
-    title: "Déclaration enregistrée",
+    title: "Report submitted",
     subtitle: "",
   },
 };

@@ -7,7 +7,7 @@ export async function contactAction(formData: FormData) {
   const message = String(formData.get("message") ?? "");
   await sendEmail({
     to: process.env.ADMIN_EMAIL ?? "admin@localhost",
-    subject: "Contact — Observatoire",
-    html: `<p>Contact: ${email}</p><p>${message}</p><p>Plateforme: ${appUrl("/")}</p>`,
+    subject: "Contact — Observatory",
+    html: `<p>Contact: ${email}</p><p>${message}</p><p>Platform: ${appUrl("/")}</p>`,
   });
 }

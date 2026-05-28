@@ -31,44 +31,44 @@ type Props = LookupProps;
 
 function formatReason(value?: string, other?: string) {
   if (!value) return undefined;
-  return value === "Autre" ? other?.trim() || "Autre" : value;
+  return value === "Other" ? other?.trim() || "Other" : value;
 }
 
 function validateStep(step: WizardStepId, data: DeclarationData): string | null {
   switch (step) {
     case "location":
-      if (!data.city.trim()) return "Indiquez une ville.";
-      if (data.centroidLat == null) return "Sélectionnez une ville dans la liste proposée.";
+      if (!data.city.trim()) return "Please enter a city.";
+      if (data.centroidLat == null) return "Please select a city from the suggested list.";
       return null;
     case "product":
-      if (!data.productCommercialName.trim()) return "Indiquez le nom du produit.";
-      if (!data.observationDate) return "Indiquez la date d'observation.";
+      if (!data.productCommercialName.trim()) return "Please enter the product name.";
+      if (!data.observationDate) return "Please enter the observation date.";
       return null;
     case "substance":
-      if (!data.primaryMoleculeId && !data.primaryMoleculeCustom?.trim()) return "Choisissez la substance active.";
-      if (!data.informationSource) return "Indiquez qui vous a communiqué ce nom.";
+      if (!data.primaryMoleculeId && !data.primaryMoleculeCustom?.trim()) return "Please select an active substance.";
+      if (!data.informationSource) return "Please indicate who told you this name.";
       return null;
     case "purchase":
-      if (data.bought === null) return "Indiquez si vous avez acheté le produit.";
+      if (data.bought === null) return "Please indicate if you purchased the product.";
       if (data.bought === false && !formatReason(data.reasonNotBought, data.reasonNotBoughtOther)) {
-        return "Précisez pourquoi vous n'avez pas acheté.";
+        return "Please specify why you did not purchase.";
       }
       return null;
     case "consumption":
-      if (data.consumed === null) return "Indiquez si vous avez consommé le produit.";
+      if (data.consumed === null) return "Please indicate if you consumed the product.";
       if (data.consumed === false && !formatReason(data.reasonNotConsumed, data.reasonNotConsumedOther)) {
-        return "Précisez pourquoi vous n'avez pas consommé.";
+        return "Please specify why you did not consume.";
       }
       return null;
     case "formOfUse":
-      if (!data.formOfUse) return "Indiquez la forme de consommation.";
+      if (!data.formOfUse) return "Please indicate the form of consumption.";
       return null;
     case "claimMatch":
-      if (!data.effectsMatchClaim) return "Indiquez si les effets correspondaient aux promesses.";
+      if (!data.effectsMatchClaim) return "Please indicate if the effects matched the claims.";
       return null;
     case "contact":
-      if (data.wantsContact === null) return "Indiquez si vous souhaitez être recontacté.";
-      if (data.wantsContact && !data.contactEmail?.trim()) return "Indiquez votre email.";
+      if (data.wantsContact === null) return "Please indicate if you wish to be contacted.";
+      if (data.wantsContact && !data.contactEmail?.trim()) return "Please enter your email.";
       return null;
     default:
       return null;
@@ -161,14 +161,14 @@ export function DeclarationWizard(props: Props) {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/api/signalements", {
+      const res = await fetch("/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(toPayload(data)),
       });
       const body = await res.json();
       if (!res.ok) {
-        setError(body.error ?? "Erreur lors de l'envoi.");
+        setError(body.error ?? "Error submitting report.");
         setSubmitting(false);
         return;
       }
@@ -176,7 +176,7 @@ export function DeclarationWizard(props: Props) {
       setSubmittedConsumed(Boolean(body.consumed));
       setDone(true);
     } catch {
-      setError("Erreur réseau. Réessayez.");
+      setError("Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -263,7 +263,7 @@ export function DeclarationWizard(props: Props) {
       totalSteps={totalForProgress}
       onBack={!done && activeIndex > 0 ? goBack : undefined}
       onNext={!done ? goNext : undefined}
-      nextLabel={currentStep === "review" ? (submitting ? "Envoi…" : "Envoyer la déclaration") : "Suivant"}
+      nextLabel={currentStep === "review" ? (submitting ? "Submitting…" : "Submit report") : "Next"}
       nextDisabled={submitting}
       hideNav={done}
     >

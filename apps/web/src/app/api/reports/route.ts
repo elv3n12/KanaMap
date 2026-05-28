@@ -131,13 +131,13 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
-    return NextResponse.json({ error: "Connexion requise" }, { status: 401 });
+    return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
   const limit = rateLimit(`report:${session.user.id}`, RateLimitPolicies.reportSubmit);
   if (!limit.success) {
     return NextResponse.json(
-      { error: "Trop de signalements envoyés récemment. Réessayez plus tard." },
+      { error: "Too many reports submitted recently. Please try again later." },
       {
         status: 429,
         headers: {
@@ -271,7 +271,7 @@ export async function POST(request: Request) {
             moderatorId: session.user.id,
             action: "SUBMIT",
             afterStatus: "PUBLISHED",
-            notes: "Signalement publié à la soumission (modération a posteriori).",
+            notes: "Report published on submission (post-moderation).",
           },
         },
       },

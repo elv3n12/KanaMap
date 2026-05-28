@@ -1,25 +1,24 @@
 export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-semibold">Politique de confidentialité</h1>
+      <h1 className="text-3xl font-semibold">Privacy Policy</h1>
       <div className="mt-6 space-y-4 rounded-2xl bg-white p-6 leading-7 shadow">
         <p>
-          Cannabinoid Observatory Europe collecte les données nécessaires au fonctionnement du
-          service : email de compte, signalements, déclarations d’effets indésirables, preuves
-          transmises et traces d’audit liées aux actions sensibles.
+          Cannabinoid Observatory Europe collects data necessary for the service to function:
+          account email, reports, adverse effect declarations, submitted evidence, and audit logs
+          related to sensitive actions.
         </p>
         <p>
-          Les adresses IP ne sont pas stockées en clair. Elles sont transformées en empreintes
-          cryptographiques avec un sel privé afin de limiter les abus tout en réduisant les données
-          personnelles conservées.
+          IP addresses are not stored in plain text. They are transformed into cryptographic
+          hashes with a private salt to limit abuse while reducing stored personal data.
         </p>
         <p>
-          Les cookies utilisés servent à maintenir la session, protéger les formulaires et afficher
-          l’age gate. Ils sont nécessaires au service et ne servent pas à la publicité.
+          Cookies used serve to maintain the session, protect forms, and display the age gate.
+          They are necessary for the service and are not used for advertising.
         </p>
         <p>
-          Un utilisateur peut demander la suppression de son compte depuis son espace personnel. Ses
-          contributions sont alors anonymisées afin de préserver l’intérêt public de la carte.
+          A user may request deletion of their account from their personal space. Their
+          contributions are then anonymized to preserve the public interest of the map.
         </p>
       </div>
     </div>

@@ -26,29 +26,29 @@ export default async function PublicReportPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <p className="text-sm font-medium text-slate-600">Signalement publié et anonymisé</p>
+      <p className="text-sm font-medium text-slate-600">Published and anonymized report</p>
       <h1 className="mt-2 text-3xl font-semibold">{publicReport.productName}</h1>
       <p className="mt-2 text-slate-700">
-        Zone : {publicReport.zone} · {PLACE_TYPE_LABELS[publicReport.placeType]}
+        Zone: {publicReport.zone} · {PLACE_TYPE_LABELS[publicReport.placeType]}
       </p>
       <div className="mt-6 grid gap-4 rounded-2xl bg-white p-6 shadow-sm md:grid-cols-2">
-        <Info label="Type de produit" value={publicReport.productType ? PRODUCT_TYPE_LABELS[publicReport.productType] : "Non précisé"} />
-        <Info label="Niveau de preuve" value={PROOF_LEVEL_LABELS[publicReport.proofLevel]} />
-        <Info label="Statut" value={REPORT_STATUS_LABELS[publicReport.moderationStatus]} />
-        <Info label="Date d’observation" value={new Date(publicReport.observationDate).toLocaleDateString("fr-FR")} />
-        <Info label="Molécules déclarées" value={publicReport.molecules.map((item) => `${item.name} (${item.kind.toLowerCase()})`).join(", ") || "Non précisées"} />
-        <Info label="Allégations observées" value={publicReport.marketingClaims.join(", ") || "Non précisées"} />
-        <Info label="Effets rapportés" value={publicReport.adverseEffects.join(", ") || "Non rapportés"} />
+        <Info label="Product type" value={publicReport.productType ? PRODUCT_TYPE_LABELS[publicReport.productType] : "Not specified"} />
+        <Info label="Proof level" value={PROOF_LEVEL_LABELS[publicReport.proofLevel]} />
+        <Info label="Status" value={REPORT_STATUS_LABELS[publicReport.moderationStatus]} />
+        <Info label="Observation date" value={new Date(publicReport.observationDate).toLocaleDateString("en-GB")} />
+        <Info label="Declared molecules" value={publicReport.molecules.map((item) => `${item.name} (${item.kind.toLowerCase()})`).join(", ") || "Not specified"} />
+        <Info label="Observed claims" value={publicReport.marketingClaims.join(", ") || "Not specified"} />
+        <Info label="Reported effects" value={publicReport.adverseEffects.join(", ") || "None reported"} />
       </div>
       {publicReport.narrative ? (
         <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Description modérée</h2>
+          <h2 className="text-xl font-semibold">Moderated description</h2>
           <p className="mt-3 whitespace-pre-line leading-7 text-slate-700">{publicReport.narrative}</p>
         </section>
       ) : null}
       <p className="mt-6 text-sm text-slate-500">
-        L’adresse exacte et les coordonnées précises ne sont pas publiées. Cette fiche documente une
-        observation, sans constituer une recommandation ni une indication d’accès.
+        The exact address and precise coordinates are not published. This record documents an
+        observation, without constituting a recommendation or access indication.
       </p>
     </div>
   );

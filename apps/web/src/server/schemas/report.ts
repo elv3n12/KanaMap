@@ -50,7 +50,7 @@ export const reportSchema = z
     placeType: z.nativeEnum(PlaceType),
     placeOtherLabel: z.string().trim().optional(),
     brandRawName: z.string().trim().optional(),
-    productCommercialName: z.string().trim().min(1, "Nom commercial obligatoire"),
+    productCommercialName: z.string().trim().min(1, "Commercial name is required"),
     productType: z.nativeEnum(ProductType),
     productOtherLabel: z.string().trim().optional(),
     formOfUse: z.nativeEnum(FormOfUse).optional(),
@@ -86,21 +86,21 @@ export const reportSchema = z
     if (data.consumed && !data.bought) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "La consommation suppose un achat.",
+        message: "Consumption requires a purchase.",
         path: ["consumed"],
       });
     }
     if (data.reasonNotBought && data.bought) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Raison incompatible avec un achat.",
+        message: "Reason incompatible with a purchase.",
         path: ["reasonNotBought"],
       });
     }
     if (data.reasonNotConsumed && (!data.bought || data.consumed)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Raison valable seulement si achat sans consommation.",
+        message: "Reason only valid if purchased but not consumed.",
         path: ["reasonNotConsumed"],
       });
     }
@@ -108,14 +108,14 @@ export const reportSchema = z
       if (!data.formOfUse) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Indiquez la forme de consommation.",
+          message: "Please indicate the form of consumption.",
           path: ["formOfUse"],
         });
       }
       if (!data.effectsMatchClaim) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Indiquez si les effets correspondent aux promesses.",
+          message: "Please indicate if the effects match the claims.",
           path: ["effectsMatchClaim"],
         });
       }
@@ -123,7 +123,7 @@ export const reportSchema = z
     if (data.wantsContact && !data.contactEmail) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Email requis pour être recontacté.",
+        message: "Email required to be contacted.",
         path: ["contactEmail"],
       });
     }
@@ -252,10 +252,10 @@ export function buildReportNarrative(parsed: ReportInput) {
   const sections: string[] = [];
   if (parsed.narrative?.trim()) sections.push(parsed.narrative.trim());
   if (parsed.positiveEffectsCustom?.trim()) {
-    sections.push(`Effets positifs (autre) : ${parsed.positiveEffectsCustom.trim()}`);
+    sections.push(`Positive effects (other): ${parsed.positiveEffectsCustom.trim()}`);
   }
   if (parsed.adverseEffectsCustom?.trim()) {
-    sections.push(`Effets négatifs (autre) : ${parsed.adverseEffectsCustom.trim()}`);
+    sections.push(`Negative effects (other): ${parsed.adverseEffectsCustom.trim()}`);
   }
   return sections.length ? sections.join("\n\n") : undefined;
 }

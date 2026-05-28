@@ -10,7 +10,7 @@ const reportInclude = {
   molecules: { include: { molecule: true } },
 } as const;
 
-export default async function AdminSignalementsPage() {
+export default async function AdminReportsPage() {
   const [recentPublished, pendingReports] = await Promise.all([
     db.report.findMany({
       where: { moderationStatus: "PUBLISHED" },
@@ -29,20 +29,20 @@ export default async function AdminSignalementsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Signalements</h1>
+        <h1 className="text-3xl font-semibold text-slate-900">Reports</h1>
         <p className="mt-2 text-slate-700">
-          Les signalements sont publiés à la soumission. Validez, limitez ou retirez-les a posteriori.
+          Reports are published on submission. Validate, limit, or remove them a posteriori.
         </p>
       </div>
 
       <section className="rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900">Publiés récemment (à valider)</h2>
-        <ReportList reports={recentPublished} empty="Aucun signalement publié pour le moment." />
+        <h2 className="text-xl font-semibold text-slate-900">Recently published (to validate)</h2>
+        <ReportList reports={recentPublished} empty="No published reports yet." />
       </section>
 
       {pendingReports.length > 0 ? (
         <section className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">En attente ou contestés</h2>
+          <h2 className="text-xl font-semibold text-slate-900">Pending or contested</h2>
           <ReportList reports={pendingReports} />
         </section>
       ) : null}
@@ -56,7 +56,7 @@ type ReportRow = Awaited<
 
 function ReportList({ reports, empty }: { reports: ReportRow[]; empty?: string }) {
   if (reports.length === 0) {
-    return <p className="mt-4 py-4 text-sm text-slate-700">{empty ?? "Aucun élément."}</p>;
+    return <p className="mt-4 py-4 text-sm text-slate-700">{empty ?? "No items."}</p>;
   }
 
   return (
@@ -64,14 +64,14 @@ function ReportList({ reports, empty }: { reports: ReportRow[]; empty?: string }
       {reports.map((report) => (
         <div key={report.id} className="flex items-center justify-between gap-4 py-4">
           <div>
-            <p className="font-medium text-slate-900">{report.productCommercialName ?? "Produit observé"}</p>
+            <p className="font-medium text-slate-900">{report.productCommercialName ?? "Observed product"}</p>
             <p className="text-sm text-slate-700">
               {report.location.displayZone} · {REPORT_STATUS_LABELS[report.moderationStatus]} ·{" "}
               {report.molecules.map((item) => item.molecule.name).join(", ")}
             </p>
           </div>
-          <Link className={btnSecondary} href={`/admin/signalements/${report.id}`}>
-            Examiner
+          <Link className={btnSecondary} href={`/admin/reports/${report.id}`}>
+            Review
           </Link>
         </div>
       ))}

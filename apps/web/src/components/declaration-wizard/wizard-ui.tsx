@@ -45,8 +45,8 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
 export function YesNoChoice({
   value,
   onChange,
-  yesLabel = "Oui",
-  noLabel = "Non",
+  yesLabel = "Yes",
+  noLabel = "No",
 }: {
   value: boolean | null;
   onChange: (value: boolean) => void;
@@ -128,18 +128,18 @@ export function ReasonSelect({
 }) {
   return (
     <div className="mt-4 space-y-3">
-      <FieldLabel htmlFor="reason-select">Précisez</FieldLabel>
+      <FieldLabel htmlFor="reason-select">Please specify</FieldLabel>
       <SelectInput id="reason-select" value={value ?? ""} onChange={(e) => onChange(e.target.value)} required>
-        <option value="">Choisir une option</option>
+        <option value="">Choose an option</option>
         {options.map((opt) => (
           <option key={opt} value={opt}>
             {opt}
           </option>
         ))}
       </SelectInput>
-      {value === "Autre" ? (
+      {value === "Other" ? (
         <div>
-          <FieldLabel htmlFor="reason-other">Précision</FieldLabel>
+          <FieldLabel htmlFor="reason-other">Details</FieldLabel>
           <TextInput
             id="reason-other"
             value={otherValue ?? ""}

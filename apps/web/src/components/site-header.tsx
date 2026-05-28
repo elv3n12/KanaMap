@@ -9,16 +9,16 @@ export async function SiteHeader() {
   const isAdmin = !!session?.user && canModerate(session.user.role);
 
   const items = [
-    { href: "/carte", label: "Carte" },
-    { href: "/comprendre", label: "Comprendre" },
+    { href: "/map", label: "Map" },
+    { href: "/understand", label: "Understand" },
     { href: "/contact", label: "Contact" },
     ...(session?.user
       ? [
-          { href: "/compte", label: "Mon compte" },
+          { href: "/account", label: "My account" },
           ...(isAdmin ? [{ href: "/admin", label: "Admin", badge: true }] : []),
         ]
-      : [{ href: "/connexion", label: "Connexion" }]),
-    { href: "/signalements/nouveau", label: "Signaler" },
+      : [{ href: "/login", label: "Login" }]),
+    { href: "/reports/new", label: "Report" },
   ];
 
   return (
@@ -28,9 +28,9 @@ export async function SiteHeader() {
           href="/"
           className="font-semibold leading-tight tracking-tight text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
         >
-          {branding.appNameFr}
+          {branding.appName}
         </Link>
-        <nav className="flex items-center gap-1" aria-label="Navigation principale">
+        <nav className="flex items-center gap-1" aria-label="Main navigation">
           <NavLinks items={items} isAdmin={isAdmin} />
         </nav>
       </div>

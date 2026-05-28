@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ id: string }> };
 
-export default async function AdminSignalementDetailPage({ params }: Props) {
+export default async function AdminReportDetailPage({ params }: Props) {
   const { id } = await params;
   const report = await db.report.findUnique({
     where: { id },
@@ -28,47 +28,47 @@ export default async function AdminSignalementDetailPage({ params }: Props) {
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <main className="space-y-6">
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold">{report.productCommercialName ?? "Produit observé"}</h1>
+          <h1 className="text-3xl font-semibold">{report.productCommercialName ?? "Observed product"}</h1>
           <p className="mt-2 text-sm text-slate-600">
             {report.location.displayZone} · {PLACE_TYPE_LABELS[report.placeType]} ·{" "}
             {REPORT_STATUS_LABELS[report.moderationStatus]}
           </p>
           {report.createdBy ? (
             <p className="mt-2 text-sm text-slate-600">
-              Auteur :{" "}
-              <a className="text-blue-700 underline" href={`/admin/utilisateurs/${report.createdBy.id}`}>
+              Author:{" "}
+              <a className="text-blue-700 underline" href={`/admin/users/${report.createdBy.id}`}>
                 {report.createdBy.email}
               </a>
             </p>
           ) : null}
           <dl className="mt-6 grid gap-4 md:grid-cols-2">
-            <Info label="Produit" value={report.productType ? PRODUCT_TYPE_LABELS[report.productType] : "Non précisé"} />
-            <Info label="Niveau de preuve" value={PROOF_LEVEL_LABELS[report.proofLevel]} />
+            <Info label="Product" value={report.productType ? PRODUCT_TYPE_LABELS[report.productType] : "Not specified"} />
+            <Info label="Proof level" value={PROOF_LEVEL_LABELS[report.proofLevel]} />
             <Info
-              label="Molécules"
-              value={report.molecules.map((item) => `${item.molecule.name} (${item.kind})`).join(", ") || "Non précisées"}
+              label="Molecules"
+              value={report.molecules.map((item) => `${item.molecule.name} (${item.kind})`).join(", ") || "Not specified"}
             />
             <Info
-              label="Allégations"
-              value={report.marketingClaims.map((item) => item.claim.label).join(", ") || "Non précisées"}
+              label="Claims"
+              value={report.marketingClaims.map((item) => item.claim.label).join(", ") || "Not specified"}
             />
             <Info
-              label="Effets"
-              value={report.adverseEffects.map((item) => item.effect.label).join(", ") || "Non rapportés"}
+              label="Effects"
+              value={report.adverseEffects.map((item) => item.effect.label).join(", ") || "None reported"}
             />
             <Info
-              label="Adresse modération"
-              value={decryptPII(report.exactAddressEncrypted) ?? "Non fournie ou masquée"}
+              label="Moderation address"
+              value={decryptPII(report.exactAddressEncrypted) ?? "Not provided or masked"}
             />
           </dl>
           {report.narrative ? <p className="mt-6 whitespace-pre-line leading-7 text-slate-700">{report.narrative}</p> : null}
         </section>
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Historique</h2>
+          <h2 className="text-xl font-semibold">History</h2>
           <div className="mt-4 space-y-2 text-sm">
             {report.moderationActions.map((action) => (
               <p key={action.id} className="rounded-lg bg-slate-50 p-2">
-                {action.action} · {action.moderator?.email ?? "système"} · {action.createdAt.toLocaleString("fr-FR")}{" "}
+                {action.action} · {action.moderator?.email ?? "system"} · {action.createdAt.toLocaleString("en-GB")}{" "}
                 · {action.notes ?? ""}
               </p>
             ))}

@@ -153,7 +153,7 @@ export function MoleculeAutocomplete({
               addCustom(canAddCustom);
             }
           }}
-          placeholder={placeholder ?? (singleSelect ? "Rechercher une molécule…" : "Ajouter des molécules…")}
+          placeholder={placeholder ?? (singleSelect ? "Search for a molecule…" : "Add molecules…")}
           className="min-h-11 w-full rounded-lg bg-white p-3 text-slate-900 outline-none"
           autoComplete="off"
         />
@@ -171,7 +171,7 @@ export function MoleculeAutocomplete({
                 type="button"
                 onClick={pill.onRemove}
                 className="rounded-full px-1 text-slate-500 hover:bg-slate-200 hover:text-slate-700"
-                aria-label={`Retirer ${pill.label}`}
+                aria-label={`Remove ${pill.label}`}
               >
                 ✕
               </button>
@@ -189,7 +189,7 @@ export function MoleculeAutocomplete({
                 className="block w-full px-4 py-2 text-left text-sm hover:bg-slate-50"
                 onClick={() => addCustom(canAddCustom)}
               >
-                Ajouter “{canAddCustom}”
+                Add &quot;{canAddCustom}&quot;
               </button>
             ) : null}
             {matches.map((opt) => (
@@ -204,7 +204,7 @@ export function MoleculeAutocomplete({
               </button>
             ))}
             {matches.length === 0 && !canAddCustom ? (
-              <p className="px-4 py-3 text-sm text-slate-600">Aucun résultat.</p>
+              <p className="px-4 py-3 text-sm text-slate-600">No results.</p>
             ) : null}
           </div>
         </div>
@@ -212,4 +212,3 @@ export function MoleculeAutocomplete({
     </div>
   );
 }
-

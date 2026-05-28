@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const turnstileOk = await verifyTurnstile(String(formData.get("turnstileToken") ?? ""), getIpFromRequest(request));
   if (!turnstileOk) {
-    return NextResponse.json({ error: "Anti-spam invalide" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid anti-spam verification" }, { status: 400 });
   }
 
   const { email, password } = signupInputSchema.parse({
@@ -46,10 +46,10 @@ export async function POST(request: Request) {
 
     await sendEmail({
       to: normalizedEmail,
-      subject: `Confirmez votre compte ${branding.appName}`,
-      html: `<p>Bienvenue sur ${branding.appName}.</p><p><a href="${appUrl(`/verifier-email/${rawToken}`)}">Confirmer mon email</a></p>`,
+      subject: `Confirm your ${branding.appName} account`,
+      html: `<p>Welcome to ${branding.appName}.</p><p><a href="${appUrl(`/verify-email/${rawToken}`)}">Confirm my email</a></p>`,
     });
   }
 
-  return NextResponse.redirect(new URL("/connexion?signup=check-email", request.url));
+  return NextResponse.redirect(new URL("/login?signup=check-email", request.url));
 }

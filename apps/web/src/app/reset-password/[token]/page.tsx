@@ -1,8 +1,22 @@
-import { redirect } from "next/navigation";
+import { btnPrimaryBlack } from "@/lib/ui/button-classes";
 
 type Props = { params: Promise<{ token: string }> };
 
 export default async function ResetPasswordPage({ params }: Props) {
   const { token } = await params;
-  redirect(`/reinitialiser/${token}`);
+
+  return (
+    <div className="mx-auto max-w-md px-4 py-12">
+      <h1 className="text-3xl font-semibold">New password</h1>
+      <form action={`/api/reset-password/${token}`} method="post" className="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+        <label className="block text-sm font-medium">
+          New password
+          <input required minLength={8} name="password" type="password" className="mt-1 w-full rounded-lg border p-3" />
+        </label>
+        <button className={btnPrimaryBlack} type="submit">
+          Save
+        </button>
+      </form>
+    </div>
+  );
 }

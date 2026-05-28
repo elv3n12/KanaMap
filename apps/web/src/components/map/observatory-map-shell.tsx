@@ -10,7 +10,7 @@ import { ZonePopup } from "@/components/map/zone-popup";
 const ZoneMap = dynamic(() => import("@/components/map/zone-map").then((mod) => mod.ZoneMap), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full items-center justify-center text-slate-500">Chargement de la carte…</div>
+    <div className="flex h-full items-center justify-center text-slate-500">Loading map…</div>
   ),
 });
 
@@ -59,12 +59,12 @@ export function ObservatoryMapShell({ molecules }: Props) {
           {filtersOpen ? (
             <>
               <span aria-hidden="true" className="text-base leading-none">✕</span>
-              Fermer
+              Close
             </>
           ) : (
             <>
               <span aria-hidden="true" className="text-base leading-none">☰</span>
-              Filtrer
+              Filter
             </>
           )}
         </button>

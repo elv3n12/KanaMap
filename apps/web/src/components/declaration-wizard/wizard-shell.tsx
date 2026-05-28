@@ -24,7 +24,7 @@ export function WizardShell({
   children,
   onBack,
   onNext,
-  nextLabel = "Suivant",
+  nextLabel = "Next",
   nextDisabled,
   hideNav,
 }: Props) {
@@ -36,7 +36,7 @@ export function WizardShell({
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs font-medium text-slate-600">
             <span>
-              Étape {stepIndex + 1} sur {totalSteps}
+              Step {stepIndex + 1} of {totalSteps}
             </span>
             <span>{progress}%</span>
           </div>
@@ -61,7 +61,7 @@ export function WizardShell({
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
             {onBack ? (
               <button type="button" className={btnSecondary} onClick={onBack}>
-                Précédent
+                Previous
               </button>
             ) : (
               <span />

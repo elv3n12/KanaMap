@@ -16,11 +16,10 @@ export function AgeGate() {
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/70 p-4">
       <div className="max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-        <h2 className="text-2xl font-semibold">Contenu réservé aux adultes</h2>
+        <h2 className="text-2xl font-semibold">Adult content</h2>
         <p className="mt-3 text-sm leading-6 text-zinc-700">
-          Cannabinoid Observatory Europe est un outil d&apos;information et de réduction des risques.
-          Le site traite de substances psychoactives et n&apos;encourage ni l&apos;achat ni la
-          consommation.
+          Cannabinoid Observatory Europe is a harm reduction and information tool.
+          This site discusses psychoactive substances and does not encourage purchase or consumption.
         </p>
         <button
           type="button"
@@ -30,7 +29,7 @@ export function AgeGate() {
             setVisible(false);
           }}
         >
-          J&apos;ai 18 ans ou plus et je comprends
+          I am 18 or older and I understand
         </button>
       </div>
     </div>

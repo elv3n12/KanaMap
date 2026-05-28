@@ -4,5 +4,5 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function ModerationSignalementRedirectPage({ params }: Props) {
   const { id } = await params;
-  redirect(`/admin/signalements/${id}`);
+  redirect(`/admin/reports/${id}`);
 }

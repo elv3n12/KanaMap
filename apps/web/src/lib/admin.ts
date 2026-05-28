@@ -51,9 +51,9 @@ export async function getAdminCounts(): Promise<AdminCounts> {
 }
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
-  USER: "Utilisateur",
-  VERIFIED_CONTRIBUTOR: "Contributeur vérifié",
-  MODERATOR: "Modérateur",
-  ADMIN: "Administrateur",
-  VERIFIED_INSTITUTION: "Institution vérifiée",
+  USER: "User",
+  VERIFIED_CONTRIBUTOR: "Verified contributor",
+  MODERATOR: "Moderator",
+  ADMIN: "Administrator",
+  VERIFIED_INSTITUTION: "Verified institution",
 };

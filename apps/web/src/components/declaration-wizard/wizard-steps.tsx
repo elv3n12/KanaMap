@@ -90,7 +90,7 @@ export function StepLocation({ data, onChange }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <FieldLabel htmlFor="country">Pays</FieldLabel>
+        <FieldLabel htmlFor="country">Country</FieldLabel>
         <SelectInput
           id="country"
           value={data.countryCode}
@@ -114,7 +114,7 @@ export function StepLocation({ data, onChange }: StepProps) {
         </SelectInput>
       </div>
       <div ref={containerRef} className="relative">
-        <FieldLabel htmlFor="city">Ville</FieldLabel>
+        <FieldLabel htmlFor="city">City</FieldLabel>
         <TextInput
           id="city"
           value={cityQuery}
@@ -123,7 +123,7 @@ export function StepLocation({ data, onChange }: StepProps) {
             onChange({ city: e.target.value, centroidLat: undefined, centroidLng: undefined });
           }}
           onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-          placeholder="Commencez à taper le nom de la ville…"
+          placeholder="Start typing the city name…"
           autoComplete="off"
           required
         />
@@ -146,7 +146,7 @@ export function StepLocation({ data, onChange }: StepProps) {
         ) : null}
       </div>
       <div>
-        <FieldLabel htmlFor="placeType">Type de commerce</FieldLabel>
+        <FieldLabel htmlFor="placeType">Business type</FieldLabel>
         <SelectInput
           id="placeType"
           value={data.placeType}
@@ -161,7 +161,7 @@ export function StepLocation({ data, onChange }: StepProps) {
       </div>
       {data.placeType === "OTHER" ? (
         <div>
-          <FieldLabel htmlFor="placeOther">Précision</FieldLabel>
+          <FieldLabel htmlFor="placeOther">Please specify</FieldLabel>
           <TextInput
             id="placeOther"
             value={data.placeOtherLabel ?? ""}
@@ -177,7 +177,7 @@ export function StepProduct({ data, onChange }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <FieldLabel htmlFor="brand">Marque observée (facultatif)</FieldLabel>
+        <FieldLabel htmlFor="brand">Brand observed (optional)</FieldLabel>
         <TextInput
           id="brand"
           value={data.brandRawName ?? ""}
@@ -185,7 +185,7 @@ export function StepProduct({ data, onChange }: StepProps) {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="productName">Nom commercial du produit</FieldLabel>
+        <FieldLabel htmlFor="productName">Commercial product name</FieldLabel>
         <TextInput
           id="productName"
           value={data.productCommercialName}
@@ -194,7 +194,7 @@ export function StepProduct({ data, onChange }: StepProps) {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="productType">Type de produit</FieldLabel>
+        <FieldLabel htmlFor="productType">Product type</FieldLabel>
         <SelectInput
           id="productType"
           value={data.productType}
@@ -208,7 +208,7 @@ export function StepProduct({ data, onChange }: StepProps) {
         </SelectInput>
       </div>
       <div>
-        <FieldLabel htmlFor="observationDate">Date d&apos;observation</FieldLabel>
+        <FieldLabel htmlFor="observationDate">Observation date</FieldLabel>
         <TextInput
           id="observationDate"
           type="date"
@@ -227,7 +227,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
       <div>
         <MoleculeAutocomplete
           id="primaryMolecule"
-          label="Substance active principale"
+          label="Primary active substance"
           options={lookups.molecules.map((m) => ({ id: m.id, name: m.name }))}
           selectedIds={data.primaryMoleculeId ? [data.primaryMoleculeId] : []}
           selectedCustomNames={data.primaryMoleculeCustom ? [data.primaryMoleculeCustom] : []}
@@ -241,7 +241,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="infoSource">Qui vous a indiqué ce nom ?</FieldLabel>
+        <FieldLabel htmlFor="infoSource">Who told you this name?</FieldLabel>
         <SelectInput
           id="infoSource"
           value={data.informationSource ?? ""}
@@ -250,7 +250,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
           }
           required
         >
-          <option value="">Choisir</option>
+          <option value="">Choose</option>
           {Object.entries(INFORMATION_SOURCE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -259,10 +259,10 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
         </SelectInput>
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-800">Autres molécules suspectées (facultatif)</p>
+        <p className="text-sm font-medium text-slate-800">Other suspected molecules (optional)</p>
         <MoleculeAutocomplete
           id="suspectedMolecules"
-          label="Ajouter des molécules suspectées"
+          label="Add suspected molecules"
           options={lookups.molecules.map((m) => ({ id: m.id, name: m.name }))}
           selectedIds={data.suspectedMoleculeIds}
           selectedCustomNames={data.suspectedMoleculeCustomNames ?? []}
@@ -275,7 +275,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
         />
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-800">Allégations marketing entendues (facultatif)</p>
+        <p className="text-sm font-medium text-slate-800">Marketing claims heard (optional)</p>
         <CheckboxGrid
           idPrefix="claim"
           options={lookups.claims.map((c) => ({ id: c.id, label: c.label }))}
@@ -330,14 +330,14 @@ export function StepFormOfUse({ data, onChange }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <FieldLabel htmlFor="formOfUse">Forme de consommation</FieldLabel>
+        <FieldLabel htmlFor="formOfUse">Form of consumption</FieldLabel>
         <SelectInput
           id="formOfUse"
           value={data.formOfUse ?? ""}
           onChange={(e) => onChange({ formOfUse: e.target.value as DeclarationData["formOfUse"] })}
           required
         >
-          <option value="">Choisir</option>
+          <option value="">Choose</option>
           {Object.entries(FORM_OF_USE_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -346,21 +346,21 @@ export function StepFormOfUse({ data, onChange }: StepProps) {
         </SelectInput>
       </div>
       <div>
-        <FieldLabel htmlFor="period">Période approximative</FieldLabel>
+        <FieldLabel htmlFor="period">Approximate period</FieldLabel>
         <TextInput
           id="period"
           value={data.approximatePeriod ?? ""}
           onChange={(e) => onChange({ approximatePeriod: e.target.value })}
-          placeholder="ex. printemps 2026"
+          placeholder="e.g. spring 2026"
         />
       </div>
       <div>
-        <FieldLabel htmlFor="duration">Durée des effets</FieldLabel>
+        <FieldLabel htmlFor="duration">Duration of effects</FieldLabel>
         <TextInput
           id="duration"
           value={data.effectDuration ?? ""}
           onChange={(e) => onChange({ effectDuration: e.target.value })}
-          placeholder="ex. plusieurs heures"
+          placeholder="e.g. several hours"
         />
       </div>
     </div>
@@ -382,7 +382,7 @@ export function StepPositiveEffects({ data, onChange, lookups }: StepProps) {
         }}
       />
       <div>
-        <FieldLabel htmlFor="posOther">Autre effet positif</FieldLabel>
+        <FieldLabel htmlFor="posOther">Other positive effect</FieldLabel>
         <TextInput
           id="posOther"
           value={data.positiveEffectsCustom ?? ""}
@@ -408,7 +408,7 @@ export function StepNegativeEffects({ data, onChange, lookups }: StepProps) {
         }}
       />
       <div>
-        <FieldLabel htmlFor="negOther">Autre effet négatif</FieldLabel>
+        <FieldLabel htmlFor="negOther">Other negative effect</FieldLabel>
         <TextInput
           id="negOther"
           value={data.adverseEffectsCustom ?? ""}
@@ -416,7 +416,7 @@ export function StepNegativeEffects({ data, onChange, lookups }: StepProps) {
         />
       </div>
       <div>
-        <FieldLabel htmlFor="withdrawal">Symptômes de sevrage éventuels</FieldLabel>
+        <FieldLabel htmlFor="withdrawal">Withdrawal symptoms (if any)</FieldLabel>
         <TextArea
           id="withdrawal"
           rows={3}
@@ -431,7 +431,7 @@ export function StepNegativeEffects({ data, onChange, lookups }: StepProps) {
           onChange={(e) => onChange({ medicalCare: e.target.checked })}
           className="h-4 w-4"
         />
-        <span className="text-sm text-slate-800">J&apos;ai eu recours à des soins ou aux urgences</span>
+        <span className="text-sm text-slate-800">I received medical care or went to the emergency room</span>
       </label>
     </div>
   );
@@ -462,17 +462,17 @@ export function StepEvidence({ data, onChange }: StepProps) {
   return (
     <div className="space-y-4">
       <div>
-        <FieldLabel htmlFor="narrative">Description libre (facultatif)</FieldLabel>
+        <FieldLabel htmlFor="narrative">Free description (optional)</FieldLabel>
         <TextArea
           id="narrative"
           rows={5}
           value={data.narrative ?? ""}
           onChange={(e) => onChange({ narrative: e.target.value })}
-          placeholder="Contexte, ambiance du lieu, échanges avec le vendeur…"
+          placeholder="Context, atmosphere of the place, conversations with the seller…"
         />
       </div>
       <div>
-        <FieldLabel htmlFor="proof">Niveau de preuve dont vous disposez</FieldLabel>
+        <FieldLabel htmlFor="proof">Proof level you have</FieldLabel>
         <SelectInput
           id="proof"
           value={data.proofLevel}
@@ -495,12 +495,12 @@ export function StepContact({ data, onChange }: StepProps) {
       <YesNoChoice
         value={data.wantsContact}
         onChange={(wantsContact) => onChange({ wantsContact })}
-        yesLabel="Oui, me recontacter"
-        noLabel="Non"
+        yesLabel="Yes, contact me"
+        noLabel="No"
       />
       {data.wantsContact ? (
         <div>
-          <FieldLabel htmlFor="email">Email de contact</FieldLabel>
+          <FieldLabel htmlFor="email">Contact email</FieldLabel>
           <TextInput
             id="email"
             type="email"
@@ -518,20 +518,20 @@ export function StepReview({ data, lookups }: { data: DeclarationData; lookups: 
   const molecule = lookups.molecules.find((m) => m.id === data.primaryMoleculeId);
   const moleculeLabel = molecule?.name ?? data.primaryMoleculeCustom?.trim() ?? "—";
   const reasonBought =
-    data.reasonNotBought === "Autre" ? data.reasonNotBoughtOther : data.reasonNotBought;
+    data.reasonNotBought === "Other" ? data.reasonNotBoughtOther : data.reasonNotBought;
   const reasonConsumed =
-    data.reasonNotConsumed === "Autre" ? data.reasonNotConsumedOther : data.reasonNotConsumed;
+    data.reasonNotConsumed === "Other" ? data.reasonNotConsumedOther : data.reasonNotConsumed;
 
   return (
     <dl className="space-y-3 text-sm">
       <div>
-        <dt className="font-medium text-slate-500">Lieu</dt>
+        <dt className="font-medium text-slate-500">Location</dt>
         <dd>
           {data.city}, {data.countryName} — {PLACE_TYPE_LABELS[data.placeType]}
         </dd>
       </div>
       <div>
-        <dt className="font-medium text-slate-500">Produit</dt>
+        <dt className="font-medium text-slate-500">Product</dt>
         <dd>{data.productCommercialName}</dd>
       </div>
       <div>
@@ -539,12 +539,12 @@ export function StepReview({ data, lookups }: { data: DeclarationData; lookups: 
         <dd>{moleculeLabel}</dd>
       </div>
       <div>
-        <dt className="font-medium text-slate-500">Achat / consommation</dt>
+        <dt className="font-medium text-slate-500">Purchase / consumption</dt>
         <dd>
-          Acheté : {data.bought ? "oui" : "non"}
+          Purchased: {data.bought ? "yes" : "no"}
           {data.bought === false && reasonBought ? ` (${reasonBought})` : ""}
           <br />
-          {data.bought ? `Consommé : ${data.consumed ? "oui" : "non"}${data.consumed === false && reasonConsumed ? ` (${reasonConsumed})` : ""}` : null}
+          {data.bought ? `Consumed: ${data.consumed ? "yes" : "no"}${data.consumed === false && reasonConsumed ? ` (${reasonConsumed})` : ""}` : null}
         </dd>
       </div>
     </dl>
@@ -556,11 +556,11 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
     return (
       <div className="space-y-4">
         <div className="rounded-xl border-2 border-rose-300 bg-rose-50 p-4 text-rose-950">
-          <p className="font-semibold">Votre sécurité passe avant tout</p>
+          <p className="font-semibold">Your safety comes first</p>
           <p className="mt-2 text-sm leading-6">
-            Si vous ressentez actuellement des symptômes graves — palpitations, douleur thoracique, difficulté à
-            respirer, hallucinations persistantes, perte de connaissance, idées suicidaires ou agitation extrême —
-            appelez <strong>immédiatement</strong> :
+            If you are currently experiencing severe symptoms — palpitations, chest pain, difficulty breathing,
+            persistent hallucinations, loss of consciousness, suicidal thoughts, or extreme agitation —
+            call <strong>immediately</strong>:
           </p>
           <ul className="mt-3 space-y-2 text-sm font-medium">
             <li>
@@ -573,19 +573,19 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
               <a href={`tel:${EMERGENCY_PHONE_EU}`} className="underline">
                 112
               </a>{" "}
-              (urgences européennes)
+              (European emergency)
             </li>
             <li>
               <a href={`tel:${DRUGS_INFO_SERVICE_PHONE.replace(/\s/g, "")}`} className="underline">
                 {DRUGS_INFO_SERVICE_PHONE}
               </a>{" "}
-              (Drogues Info Service)
+              (Drugs Info Service)
             </li>
           </ul>
         </div>
         <p className="text-sm text-slate-700">
-          Votre déclaration a été enregistrée. Elle sera examinée dans le cadre de la modération de
-          l&apos;observatoire.
+          Your report has been recorded. It will be reviewed as part of the observatory&apos;s
+          moderation process.
         </p>
       </div>
     );
@@ -593,8 +593,8 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
 
   return (
     <p className="text-sm leading-6 text-slate-700">
-      Votre observation a été enregistrée. Elle entrera dans le processus de modération de
-      l&apos;observatoire. Merci pour votre contribution citoyenne.
+      Your observation has been recorded. It will enter the observatory&apos;s moderation process.
+      Thank you for your contribution.
     </p>
   );
 }
@@ -602,11 +602,11 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
 export function ConfirmationActions() {
   return (
     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-      <Link href="/carte" className={btnPrimary}>
-        Retour à la carte
+      <Link href="/map" className={btnPrimary}>
+        Back to map
       </Link>
-      <Link href="/compte" className="text-center text-sm text-blue-700 underline">
-        Mes signalements
+      <Link href="/account" className="text-center text-sm text-blue-700 underline">
+        My reports
       </Link>
     </div>
   );

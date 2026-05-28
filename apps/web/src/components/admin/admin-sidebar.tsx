@@ -14,26 +14,26 @@ export async function AdminSidebar({ role }: { role: string }) {
   const admin = isAdmin(role);
 
   const items: NavItem[] = [
-    { href: "/admin", label: "Tableau de bord" },
+    { href: "/admin", label: "Dashboard" },
     {
-      href: "/admin/signalements",
-      label: "Signalements",
+      href: "/admin/reports",
+      label: "Reports",
       badge: counts.pendingReports + counts.contestedReports,
     },
     {
       href: "/admin/declarations",
-      label: "Effets indésirables",
+      label: "Adverse effects",
       badge: counts.pendingDeclarations,
     },
-    { href: "/admin/utilisateurs", label: "Utilisateurs", badge: counts.totalUsers, adminOnly: true },
-    { href: "/admin/referentiels", label: "Référentiels", adminOnly: true },
-    { href: "/admin/audit", label: "Journal d'audit", adminOnly: true },
+    { href: "/admin/users", label: "Users", badge: counts.totalUsers, adminOnly: true },
+    { href: "/admin/referentials", label: "Referentials", adminOnly: true },
+    { href: "/admin/audit", label: "Audit log", adminOnly: true },
   ];
 
   return (
     <aside className="w-56 shrink-0 border-r border-slate-200 bg-white p-4">
       <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Administration</p>
-      <nav className="flex flex-col gap-1" aria-label="Navigation admin">
+      <nav className="flex flex-col gap-1" aria-label="Admin navigation">
         {items.map((item) => {
           if (item.adminOnly && !admin) return null;
           return (

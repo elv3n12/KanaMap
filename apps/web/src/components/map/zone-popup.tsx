@@ -14,14 +14,14 @@ export function ZonePopup({ zone, onClose }: Props) {
         <div>
           <h2 className="text-lg font-semibold text-slate-900">{zone.zone}</h2>
           <p className="mt-0.5 text-xs text-slate-500">
-            {zone.reportCount} signalement{zone.reportCount > 1 ? "s" : ""}
+            {zone.reportCount} report{zone.reportCount > 1 ? "s" : ""}
           </p>
         </div>
         <button
           type="button"
           onClick={onClose}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-          aria-label="Fermer"
+          aria-label="Close"
         >
           ✕
         </button>
@@ -43,14 +43,14 @@ export function ZonePopup({ zone, onClose }: Props) {
                 </span>
               ))
             ) : (
-              <span className="text-xs text-slate-400">Non précisées</span>
+              <span className="text-xs text-slate-400">Not specified</span>
             )}
           </div>
         </div>
 
         {/* Adverse effects */}
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Effets négatifs</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Adverse effects</h3>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {zone.adverseEffects.length > 0 ? (
               zone.adverseEffects.map((eff) => (
@@ -62,14 +62,14 @@ export function ZonePopup({ zone, onClose }: Props) {
                 </span>
               ))
             ) : (
-              <span className="text-xs text-slate-400">Aucun rapporté</span>
+              <span className="text-xs text-slate-400">None reported</span>
             )}
           </div>
         </div>
 
         {/* Proof level */}
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-slate-500">Niveau de preuve max.</span>
+          <span className="font-medium text-slate-500">Max proof level</span>
           <span className="font-semibold text-slate-700">{PROOF_LEVEL_LABELS[zone.maxProofLevel]}</span>
         </div>
       </div>
@@ -77,7 +77,7 @@ export function ZonePopup({ zone, onClose }: Props) {
       {/* Footer */}
       <div className="border-t border-slate-100 px-5 py-3">
         <p className="text-[11px] leading-4 text-slate-400">
-          Coordonnées volontairement approximées. L&apos;observatoire documente des zones, pas des points d&apos;accès.
+          Coordinates intentionally approximated. The observatory documents zones, not access points.
         </p>
       </div>
     </section>

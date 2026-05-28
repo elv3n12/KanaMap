@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
   const session = await auth();
-  if (!session?.user) redirect("/connexion");
+  if (!session?.user) redirect("/login");
 
   const [reports, declarations] = await Promise.all([
     db.report.findMany({
@@ -26,42 +26,42 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-semibold">Mon compte</h1>
+      <h1 className="text-3xl font-semibold">My account</h1>
       <p className="mt-2 text-sm text-slate-700">{session.user.email}</p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/signalements/nouveau" className={btnNavPill}>
-          Soumettre un signalement
+        <Link href="/reports/new" className={btnNavPill}>
+          Submit a report
         </Link>
-        <Link href="/declarer-effet-indesirable" className={btnSecondary}>
-          Déclarer un effet indésirable
+        <Link href="/reports/new" className={btnSecondary}>
+          Report adverse effects
         </Link>
       </div>
       <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">Mes signalements</h2>
+        <h2 className="text-xl font-semibold">My reports</h2>
         <div className="mt-4 divide-y">
           {reports.map((report) => (
             <div key={report.id} className="py-4">
-              <p className="font-medium">{report.productCommercialName ?? "Produit observé"}</p>
+              <p className="font-medium">{report.productCommercialName ?? "Observed product"}</p>
               <p className="text-sm text-slate-600">
                 {report.location.displayZone} · {REPORT_STATUS_LABELS[report.moderationStatus]}
               </p>
             </div>
           ))}
-          {reports.length === 0 ? <p className="py-4 text-sm text-slate-600">Aucun signalement.</p> : null}
+          {reports.length === 0 ? <p className="py-4 text-sm text-slate-600">No reports yet.</p> : null}
         </div>
       </section>
       <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">Mes déclarations d’effets indésirables</h2>
-        <p className="mt-3 text-sm text-slate-600">{declarations.length} déclaration(s) transmise(s).</p>
+        <h2 className="text-xl font-semibold">My adverse effect declarations</h2>
+        <p className="mt-3 text-sm text-slate-600">{declarations.length} declaration(s) submitted.</p>
       </section>
       <form action={deleteAccountAction} className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5">
-        <h2 className="font-semibold text-red-900">Droit à l’oubli</h2>
+        <h2 className="font-semibold text-red-900">Right to be forgotten</h2>
         <p className="mt-2 text-sm text-red-800">
-          La suppression anonymise vos contributions pour préserver l’intérêt public des données
-          agrégées.
+          Deletion anonymizes your contributions to preserve the public interest of
+          aggregated data.
         </p>
         <button className={`mt-4 ${btnDestructive}`} type="submit">
-          Supprimer mon compte
+          Delete my account
         </button>
       </form>
       <form
@@ -72,7 +72,7 @@ export default async function AccountPage() {
         className="mt-8"
       >
         <button className={btnSecondary} type="submit">
-          Se déconnecter
+          Log out
         </button>
       </form>
     </div>

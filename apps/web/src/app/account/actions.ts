@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 
 export async function deleteAccountAction() {
   const session = await auth();
-  if (!session?.user) redirect("/connexion");
+  if (!session?.user) redirect("/login");
 
   await db.$transaction([
     db.report.updateMany({
