@@ -12,6 +12,7 @@ services:
       - web_uploads:/app/uploads
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=n8n_default"
       - "traefik.http.routers.kanamap.rule=Host(`kanamap.srv1339684.hstgr.cloud`)"
       - "traefik.http.routers.kanamap.tls=true"
       - "traefik.http.routers.kanamap.entrypoints=web,websecure"
