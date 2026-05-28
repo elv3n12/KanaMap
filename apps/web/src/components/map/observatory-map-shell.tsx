@@ -1,13 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Molecule } from "@prisma/client";
 import type { ZonePayload } from "@/lib/report-serializers";
 import { ZoneFilters } from "@/components/map/zone-filters";
 import { ZonePopup } from "@/components/map/zone-popup";
-import { btnIcon } from "@/lib/ui/button-classes";
 
 const ZoneMap = dynamic(() => import("@/components/map/zone-map").then((mod) => mod.ZoneMap), {
   ssr: false,
@@ -81,22 +79,11 @@ export function ObservatoryMapShell({ molecules }: Props) {
         )}
       </div>
 
-      {/* Top-right: Add report button */}
-      <Link
-        href="/signalements/nouveau"
-        className="absolute right-4 top-16 z-[900] inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-md transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
-      >
-        <span aria-hidden="true" className="text-lg leading-none">+</span>
-        Signaler
-      </Link>
 
-      {/* Bottom-left: Selected zone popup */}
+      {/* Bottom-left: Selected zone panel */}
       {selectedZone && (
-        <div className="absolute bottom-4 left-4 z-[900] w-[min(92vw,390px)]">
-          <button className={btnIcon} type="button" onClick={() => setSelectedZone(null)}>
-            Fermer
-          </button>
-          <ZonePopup zone={selectedZone} />
+        <div className="absolute bottom-4 left-4 z-[900] w-[min(92vw,380px)]">
+          <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
         </div>
       )}
     </div>

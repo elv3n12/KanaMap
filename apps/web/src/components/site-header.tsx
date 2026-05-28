@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { AdminNavLink } from "@/components/admin/admin-nav-link";
 import { branding } from "@/lib/branding";
 import { canModerate } from "@/lib/moderation";
-import { btnNavPillBlack, linkNav } from "@/lib/ui/button-classes";
+import { linkNav } from "@/lib/ui/button-classes";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -18,6 +18,12 @@ export async function SiteHeader() {
           {branding.appNameFr}
         </Link>
         <nav className="flex items-center gap-1 text-sm" aria-label="Navigation principale">
+          <Link
+            href="/signalements/nouveau"
+            className="mr-1 inline-flex min-h-9 items-center rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+          >
+            Signaler
+          </Link>
           <Link href="/carte" className={linkNav}>
             Carte
           </Link>
@@ -30,29 +36,14 @@ export async function SiteHeader() {
           {session?.user ? (
             <>
               <Link href="/compte" className={linkNav}>
-                Compte
+                Mon compte
               </Link>
               {canModerate(session.user.role) ? <AdminNavLink /> : null}
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button className={linkNav} type="submit">
-                  Déconnexion
-                </button>
-              </form>
             </>
           ) : (
-            <>
-              <Link href="/connexion" className={linkNav}>
-                Connexion
-              </Link>
-              <Link href="/inscription" className={btnNavPillBlack}>
-                Créer un compte
-              </Link>
-            </>
+            <Link href="/connexion" className={linkNav}>
+              Connexion
+            </Link>
           )}
         </nav>
       </div>

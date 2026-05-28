@@ -43,12 +43,6 @@ function ClusteredZones({ zones, onSelect }: Props) {
         opacity: 0.9,
       });
 
-      circle.bindPopup(
-        `<strong>${escapeHtml(zone.zone)}</strong><br>` +
-          `Signalements : ${zone.reportCount}<br>` +
-          `Substances : ${zone.molecules.length}<br>` +
-          `Effets négatifs : ${zone.adverseEffects.length}`,
-      );
       circle.on("click", () => onSelect(zone));
       circle.addTo(map);
       layers.push(circle);
@@ -62,19 +56,6 @@ function ClusteredZones({ zones, onSelect }: Props) {
   }, [map, onSelect, zones]);
 
   return null;
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (char) => {
-    const entities: Record<string, string> = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
-    };
-    return entities[char];
-  });
 }
 
 export function ZoneMap(props: Props) {

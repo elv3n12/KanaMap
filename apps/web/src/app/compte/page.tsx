@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { deleteAccountAction } from "./actions";
@@ -62,6 +62,17 @@ export default async function AccountPage() {
         </p>
         <button className={`mt-4 ${btnDestructive}`} type="submit">
           Supprimer mon compte
+        </button>
+      </form>
+      <form
+        action={async () => {
+          "use server";
+          await signOut({ redirectTo: "/" });
+        }}
+        className="mt-8"
+      >
+        <button className={btnSecondary} type="submit">
+          Se déconnecter
         </button>
       </form>
     </div>
