@@ -1,6 +1,15 @@
-import { UserRole } from "@prisma/client";
-import { hash } from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const seedDir = path.dirname(fileURLToPath(import.meta.url));
+const webRoot = path.join(seedDir, "../apps/web");
+const require = createRequire(import.meta.url);
+
+const { PrismaClient, UserRole } = require(
+  path.join(webRoot, "node_modules/.prisma/client"),
+) as typeof import("@prisma/client");
+const { hash } = require(path.join(webRoot, "node_modules/bcryptjs")) as typeof import("bcryptjs");
 
 const prisma = new PrismaClient();
 
