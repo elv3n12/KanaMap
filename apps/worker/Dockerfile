@@ -10,7 +10,7 @@ COPY apps/worker ./apps/worker
 COPY prisma ./prisma
 WORKDIR /app/apps/worker
 RUN npm run db:generate
-RUN if [ -d /app/node_modules/.prisma/client ]; then mkdir -p /app/apps/worker/node_modules/.prisma && cp -R /app/node_modules/.prisma/client /app/apps/worker/node_modules/.prisma/; fi
+RUN mkdir -p /app/apps/worker/node_modules/.prisma && cp -R /app/apps/web/node_modules/.prisma/client /app/apps/worker/node_modules/.prisma/client
 RUN npm run build
 
 FROM node:22-alpine AS runner
