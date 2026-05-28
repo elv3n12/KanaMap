@@ -2,15 +2,22 @@ import { DRUGS_INFO_SERVICE_PHONE } from "@/lib/constants";
 
 export function RiskBanner() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[1000] flex min-h-16 items-center justify-center border-t border-red-950 bg-red-900 px-4 py-3 text-center text-sm font-medium text-white shadow-2xl">
-      Les cannabinoïdes synthétiques sont strictement interdits en France. Les cannabinoïdes
-      semi-synthétiques sont des molécules sur lesquelles la communauté scientifique a très peu de
-      recul. Soyez prudent et attentif aux risques d&apos;accoutumance. Pour tout problème
-      d&apos;addiction, appelez Drogues Info Service au{" "}
-      <a className="ml-1 underline" href={`tel:${DRUGS_INFO_SERVICE_PHONE.replaceAll(" ", "")}`}>
-        {DRUGS_INFO_SERVICE_PHONE}
-      </a>
-      .
+    <div className="fixed bottom-4 left-1/2 z-[1000] w-[min(92vw,560px)] -translate-x-1/2 rounded-xl border border-red-800/60 bg-red-900/95 px-5 py-3 text-white shadow-2xl backdrop-blur-sm">
+      <p className="text-center text-xs font-medium leading-relaxed">
+        Les cannabinoïdes synthétiques sont strictement interdits en France.
+        <br className="hidden sm:inline" />{" "}
+        Les cannabinoïdes semi-synthétiques sont des molécules sur lesquelles la communauté
+        scientifique a très peu de recul.
+      </p>
+      <p className="mt-1.5 text-center text-xs leading-relaxed text-red-200">
+        Soyez prudent face aux risques d&apos;accoutumance.{" "}
+        <a
+          className="font-semibold text-white underline underline-offset-2"
+          href={`tel:${DRUGS_INFO_SERVICE_PHONE.replaceAll(" ", "")}`}
+        >
+          Drogues Info Service : {DRUGS_INFO_SERVICE_PHONE}
+        </a>
+      </p>
     </div>
   );
 }

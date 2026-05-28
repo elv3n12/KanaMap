@@ -4,10 +4,7 @@ import { db } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export default async function MapPage() {
-  const [molecules, effects] = await Promise.all([
-    db.molecule.findMany({ orderBy: { name: "asc" } }),
-    db.adverseEffect.findMany({ orderBy: { label: "asc" } }),
-  ]);
+  const molecules = await db.molecule.findMany({ orderBy: { name: "asc" } });
 
-  return <ObservatoryMapShell molecules={molecules} effects={effects} />;
+  return <ObservatoryMapShell molecules={molecules} />;
 }

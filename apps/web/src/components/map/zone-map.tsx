@@ -82,7 +82,7 @@ export function ZoneMap(props: Props) {
     <MapContainer center={[48.8566, 2.3522]} zoom={5} minZoom={3} className="h-full w-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
       <ClusteredZones {...props} />
     </MapContainer>
