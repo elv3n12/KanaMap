@@ -41,7 +41,7 @@ export default async function AdminDashboardPage() {
         <p className="mt-2 text-slate-700">Vue d&apos;ensemble de la modération et de l&apos;activité.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           label="À modérer"
           value={counts.toReview}
@@ -49,6 +49,7 @@ export default async function AdminDashboardPage() {
           highlight={counts.toReview > 0}
         />
         <StatCard label="Contestés" value={counts.contestedReports} href="/admin/signalements" />
+        <StatCard label="Effets indésirables" value={counts.reportsWithEffects} href="/admin/declarations" />
         <StatCard label="Publiés (7 j)" value={counts.recentPublished} href="/admin/signalements" />
         <StatCard label="Utilisateurs" value={counts.totalUsers} href="/admin/utilisateurs" adminOnly />
       </div>

@@ -6,6 +6,7 @@ export type AdminCounts = {
   pendingReports: number;
   contestedReports: number;
   pendingDeclarations: number;
+  reportsWithEffects: number;
   recentPublished: number;
   totalUsers: number;
   toReview: number;
@@ -22,13 +23,14 @@ export function canAccessAdmin(role?: string | null) {
 export async function getAdminCounts(): Promise<AdminCounts> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [pendingReports, contestedReports, pendingDeclarations, recentPublished, totalUsers] =
+  const [pendingReports, contestedReports, pendingDeclarations, reportsWithEffects, recentPublished, totalUsers] =
     await Promise.all([
       db.report.count({ where: { moderationStatus: "PENDING_REVIEW" } }),
       db.report.count({ where: { moderationStatus: "CONTESTED" } }),
       db.adverseEffectDeclaration.count({
         where: { moderationStatus: { in: ["PENDING_REVIEW", "CONTESTED"] } },
       }),
+      db.report.count({ where: { adverseEffects: { some: {} } } }),
       db.report.count({
         where: { moderationStatus: "PUBLISHED", publishedAt: { gte: sevenDaysAgo } },
       }),
@@ -41,6 +43,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     pendingReports,
     contestedReports,
     pendingDeclarations,
+    reportsWithEffects,
     recentPublished,
     totalUsers,
     toReview,

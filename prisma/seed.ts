@@ -30,6 +30,7 @@ const molecules = [
   "Delta-10-THC",
   "CBN",
   "CBG",
+  "Muscimol",
   "Molécule inconnue",
   "Mélange non identifié",
   "Autre",
