@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { Molecule } from "@prisma/client";
 import { PLACE_TYPE_LABELS } from "@/lib/constants";
+import { MoleculeAutocomplete } from "@/components/ui/molecule-autocomplete";
 
 type Props = {
   molecules: Molecule[];
@@ -45,6 +46,15 @@ export function ZoneFilters({ molecules, filters, onChange }: Props) {
     onChange({ ...filters, [name]: value });
   }
 
+  const selectedIds = (filters.moleculeIds ?? "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const selectedNames = (filters.moleculeNames ?? "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+
   return (
     <div className="grid gap-3">
       <FilterSelect
@@ -60,19 +70,18 @@ export function ZoneFilters({ molecules, filters, onChange }: Props) {
           </option>
         ))}
       </FilterSelect>
-      <FilterSelect
+      <MoleculeAutocomplete
         id="filter-molecule"
         label="Molécule"
-        value={filters.moleculeId ?? ""}
-        onChange={(v) => set("moleculeId", v)}
-      >
-        <option value="">Toutes les molécules</option>
-        {molecules.map((molecule) => (
-          <option key={molecule.id} value={molecule.id}>
-            {molecule.name}
-          </option>
-        ))}
-      </FilterSelect>
+        options={molecules.map((m) => ({ id: m.id, name: m.name }))}
+        selectedIds={selectedIds}
+        selectedCustomNames={selectedNames}
+        onChange={({ ids, customNames }) => {
+          set("moleculeIds", ids.join(","));
+          set("moleculeNames", customNames.join(","));
+        }}
+        placeholder="Rechercher une molécule…"
+      />
     </div>
   );
 }

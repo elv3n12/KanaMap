@@ -34,7 +34,9 @@ export type DeclarationData = {
   productType: ProductType;
   observationDate: string;
   primaryMoleculeId?: string;
+  primaryMoleculeCustom?: string;
   suspectedMoleculeIds: string[];
+  suspectedMoleculeCustomNames: string[];
   informationSource?: InformationSource;
   marketingClaimIds: string[];
   bought: boolean | null;
@@ -68,6 +70,7 @@ export const defaultDeclarationData = (): DeclarationData => ({
   productType: "VAPE",
   observationDate: new Date().toISOString().slice(0, 10),
   suspectedMoleculeIds: [],
+  suspectedMoleculeCustomNames: [],
   marketingClaimIds: [],
   bought: null,
   consumed: null,

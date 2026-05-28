@@ -14,6 +14,55 @@ import {
 
 export const runtime = "nodejs";
 
+function slugify(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+async function ensureMoleculesByName(names: string[]) {
+  const clean = Array.from(
+    new Map(
+      names
+        .map((n) => n.trim())
+        .filter(Boolean)
+        .map((n) => [n.toLowerCase(), n] as const),
+    ).values(),
+  );
+  if (clean.length === 0) return [];
+
+  const existing = await db.molecule.findMany({
+    where: { name: { in: clean } },
+    select: { id: true, name: true },
+  });
+  const existingByLower = new Map(existing.map((m) => [m.name.toLowerCase(), m.id] as const));
+
+  const ids: string[] = [];
+  const toCreate: string[] = [];
+  for (const name of clean) {
+    const id = existingByLower.get(name.toLowerCase());
+    if (id) ids.push(id);
+    else toCreate.push(name);
+  }
+  if (toCreate.length === 0) return ids;
+
+  for (const name of toCreate) {
+    const created = await db.molecule.upsert({
+      where: { slug: slugify(name) },
+      update: { name },
+      create: { name, slug: slugify(name) },
+      select: { id: true },
+    });
+    ids.push(created.id);
+  }
+
+  return ids;
+}
+
 const includeReport = {
   location: true,
   product: true,
@@ -48,6 +97,13 @@ export async function POST(request: Request) {
       : parseReportFormData(await request.formData());
 
   const sanitized = sanitizeReportInput(parsed);
+
+  const [announcedFromNames, suspectedFromNames] = await Promise.all([
+    ensureMoleculesByName(parsed.announcedMoleculeNames ?? []),
+    ensureMoleculesByName(parsed.suspectedMoleculeNames ?? []),
+  ]);
+  const announcedIds = Array.from(new Set([...(parsed.announcedMoleculeIds ?? []), ...announcedFromNames]));
+  const suspectedIds = Array.from(new Set([...(parsed.suspectedMoleculeIds ?? []), ...suspectedFromNames]));
 
   let centroidLat = parsed.centroidLat;
   let centroidLng = parsed.centroidLng;
@@ -130,7 +186,7 @@ export async function POST(request: Request) {
         parsed.wantsContact && parsed.contactEmail
           ? Buffer.from(parsed.contactEmail).toString("base64")
           : null,
-      molecules: { create: moleculeConnections(parsed.announcedMoleculeIds, parsed.suspectedMoleculeIds) },
+      molecules: { create: moleculeConnections(announcedIds, suspectedIds) },
       marketingClaims: { create: parsed.marketingClaimIds.map((claimId) => ({ claimId })) },
       adverseEffects: { create: parsed.adverseEffectIds.map((effectId) => ({ effectId })) },
       positiveEffects: { create: parsed.positiveEffectIds.map((effectId) => ({ effectId })) },

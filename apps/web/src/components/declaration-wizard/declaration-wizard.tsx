@@ -45,7 +45,7 @@ function validateStep(step: WizardStepId, data: DeclarationData): string | null 
       if (!data.observationDate) return "Indiquez la date d'observation.";
       return null;
     case "substance":
-      if (!data.primaryMoleculeId) return "Choisissez la substance active.";
+      if (!data.primaryMoleculeId && !data.primaryMoleculeCustom?.trim()) return "Choisissez la substance active.";
       if (!data.informationSource) return "Indiquez qui vous a communiqué ce nom.";
       return null;
     case "purchase":
@@ -77,7 +77,10 @@ function validateStep(step: WizardStepId, data: DeclarationData): string | null 
 
 function toPayload(data: DeclarationData) {
   const announced = data.primaryMoleculeId ? [data.primaryMoleculeId] : [];
+  const announcedNames =
+    !data.primaryMoleculeId && data.primaryMoleculeCustom?.trim() ? [data.primaryMoleculeCustom.trim()] : [];
   const suspected = data.suspectedMoleculeIds.filter((id) => id !== data.primaryMoleculeId);
+  const suspectedNames = (data.suspectedMoleculeCustomNames ?? []).map((x) => x.trim()).filter(Boolean);
 
   return {
     countryCode: data.countryCode,
@@ -94,6 +97,8 @@ function toPayload(data: DeclarationData) {
     observationDate: data.observationDate,
     announcedMoleculeIds: announced,
     suspectedMoleculeIds: suspected,
+    announcedMoleculeNames: announcedNames,
+    suspectedMoleculeNames: suspectedNames,
     marketingClaimIds: data.marketingClaimIds,
     informationSource: data.informationSource,
     bought: data.bought === true,

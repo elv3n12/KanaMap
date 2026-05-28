@@ -27,6 +27,7 @@ import {
   TextInput,
   YesNoChoice,
 } from "./wizard-ui";
+import { MoleculeAutocomplete } from "@/components/ui/molecule-autocomplete";
 
 type StepProps = {
   data: DeclarationData;
@@ -221,30 +222,23 @@ export function StepProduct({ data, onChange }: StepProps) {
 }
 
 export function StepSubstance({ data, onChange, lookups }: StepProps) {
-  const toggleSuspected = (id: string) => {
-    const next = data.suspectedMoleculeIds.includes(id)
-      ? data.suspectedMoleculeIds.filter((x) => x !== id)
-      : [...data.suspectedMoleculeIds, id];
-    onChange({ suspectedMoleculeIds: next });
-  };
-
   return (
     <div className="space-y-4">
       <div>
-        <FieldLabel htmlFor="primaryMolecule">Substance active principale</FieldLabel>
-        <SelectInput
+        <MoleculeAutocomplete
           id="primaryMolecule"
-          value={data.primaryMoleculeId ?? ""}
-          onChange={(e) => onChange({ primaryMoleculeId: e.target.value || undefined })}
-          required
-        >
-          <option value="">Choisir une molécule</option>
-          {lookups.molecules.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name}
-            </option>
-          ))}
-        </SelectInput>
+          label="Substance active principale"
+          options={lookups.molecules.map((m) => ({ id: m.id, name: m.name }))}
+          selectedIds={data.primaryMoleculeId ? [data.primaryMoleculeId] : []}
+          selectedCustomNames={data.primaryMoleculeCustom ? [data.primaryMoleculeCustom] : []}
+          onChange={({ ids, customNames }) =>
+            onChange({
+              primaryMoleculeId: ids[0] || undefined,
+              primaryMoleculeCustom: ids.length ? undefined : (customNames[0] ?? undefined),
+            })
+          }
+          singleSelect
+        />
       </div>
       <div>
         <FieldLabel htmlFor="infoSource">Qui vous a indiqué ce nom ?</FieldLabel>
@@ -266,11 +260,18 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
       </div>
       <div>
         <p className="text-sm font-medium text-slate-800">Autres molécules suspectées (facultatif)</p>
-        <CheckboxGrid
-          idPrefix="mol"
-          options={lookups.molecules.map((m) => ({ id: m.id, label: m.name }))}
-          selected={data.suspectedMoleculeIds}
-          onToggle={toggleSuspected}
+        <MoleculeAutocomplete
+          id="suspectedMolecules"
+          label="Ajouter des molécules suspectées"
+          options={lookups.molecules.map((m) => ({ id: m.id, name: m.name }))}
+          selectedIds={data.suspectedMoleculeIds}
+          selectedCustomNames={data.suspectedMoleculeCustomNames ?? []}
+          onChange={({ ids, customNames }) =>
+            onChange({
+              suspectedMoleculeIds: ids,
+              suspectedMoleculeCustomNames: customNames,
+            })
+          }
         />
       </div>
       <div>
@@ -515,6 +516,7 @@ export function StepContact({ data, onChange }: StepProps) {
 
 export function StepReview({ data, lookups }: { data: DeclarationData; lookups: LookupProps }) {
   const molecule = lookups.molecules.find((m) => m.id === data.primaryMoleculeId);
+  const moleculeLabel = molecule?.name ?? data.primaryMoleculeCustom?.trim() ?? "—";
   const reasonBought =
     data.reasonNotBought === "Autre" ? data.reasonNotBoughtOther : data.reasonNotBought;
   const reasonConsumed =
@@ -534,7 +536,7 @@ export function StepReview({ data, lookups }: { data: DeclarationData; lookups: 
       </div>
       <div>
         <dt className="font-medium text-slate-500">Substance</dt>
-        <dd>{molecule?.name ?? "—"}</dd>
+        <dd>{moleculeLabel}</dd>
       </div>
       <div>
         <dt className="font-medium text-slate-500">Achat / consommation</dt>

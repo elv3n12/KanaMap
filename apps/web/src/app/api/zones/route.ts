@@ -17,7 +17,15 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const countryCode = url.searchParams.get("countryCode") || undefined;
   const city = url.searchParams.get("city") || undefined;
-  const moleculeId = url.searchParams.get("moleculeId") || undefined;
+  const moleculeId = url.searchParams.get("moleculeId") || undefined; // legacy single-select
+  const moleculeIds = (url.searchParams.get("moleculeIds") || "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const moleculeNames = (url.searchParams.get("moleculeNames") || "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
   const placeType = (url.searchParams.get("placeType") as PlaceType | null) || undefined;
   const productType = (url.searchParams.get("productType") as ProductType | null) || undefined;
   const proofLevel = (url.searchParams.get("proofLevel") as ProofLevel | null) || undefined;
@@ -26,12 +34,22 @@ export async function GET(request: Request) {
   const from = url.searchParams.get("from");
   const to = url.searchParams.get("to");
 
+  const moleculeOr: object[] = [];
+  if (moleculeIds.length > 0) {
+    moleculeOr.push({ molecules: { some: { moleculeId: { in: moleculeIds } } } });
+  } else if (moleculeId) {
+    moleculeOr.push({ molecules: { some: { moleculeId } } });
+  }
+  if (moleculeNames.length > 0) {
+    moleculeOr.push({ molecules: { some: { molecule: { name: { in: moleculeNames } } } } });
+  }
+
   const reports = await db.report.findMany({
     where: {
       moderationStatus: status && publicStatuses().includes(status) ? status : { in: publicStatuses() },
       ...(countryCode ? { location: { countryCode } } : {}),
       ...(city ? { location: { city: { contains: city } } } : {}),
-      ...(moleculeId ? { molecules: { some: { moleculeId } } } : {}),
+      ...(moleculeOr.length > 0 ? { OR: moleculeOr } : {}),
       ...(placeType ? { placeType } : {}),
       ...(productType ? { productType } : {}),
       ...(proofLevel ? { proofLevel } : {}),
