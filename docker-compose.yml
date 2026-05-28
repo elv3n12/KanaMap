@@ -1,20 +1,4 @@
 services:
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-      - web_uploads:/srv/uploads:ro
-    depends_on:
-      - web
-
   web:
     build:
       context: .
@@ -26,17 +10,16 @@ services:
       UPLOAD_DIR: /app/uploads
     volumes:
       - web_uploads:/app/uploads
-    depends_on:
-      mysql:
-        condition: service_healthy
-
-  worker:
-    build:
-      context: .
-      dockerfile: apps/worker/Dockerfile
-    restart: unless-stopped
-    env_file:
-      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kanamap.rule=Host(`kanamap.srv1339684.hstgr.cloud`)"
+      - "traefik.http.routers.kanamap.tls=true"
+      - "traefik.http.routers.kanamap.entrypoints=web,websecure"
+      - "traefik.http.routers.kanamap.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.kanamap.loadbalancer.server.port=3000"
+    networks:
+      - n8n_default
+      - default
     depends_on:
       mysql:
         condition: service_healthy
@@ -46,8 +29,6 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backups:/backups
@@ -56,9 +37,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - default
+
+networks:
+  n8n_default:
+    external: true
+  default:
 
 volumes:
-  caddy_data:
-  caddy_config:
   mysql_data:
   web_uploads:
