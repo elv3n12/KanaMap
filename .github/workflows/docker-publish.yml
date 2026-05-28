@@ -39,6 +39,8 @@ jobs:
         with:
           context: .
           file: apps/web/Dockerfile
+          build-args: |
+            NEXT_PUBLIC_MAPTILER_KEY=${{ secrets.NEXT_PUBLIC_MAPTILER_KEY }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
