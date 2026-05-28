@@ -82,21 +82,6 @@ docker compose up -d --build
 docker compose exec web npm run db:seed
 ```
 
-## CI/CD GitHub Actions
-
-Le pipeline CI/CD est composé de 2 workflows :
-
-1. `Build & Push Docker Image` : build/push l'image web vers GHCR (`latest` + `sha`).
-2. `Deploy Production` : déclenché automatiquement après un build réussi sur `main`, se connecte en SSH au VPS et redéploie `docker-compose.prod.yml`.
-
-Secrets GitHub requis (`Settings > Secrets and variables > Actions`) :
-
-- `NEXT_PUBLIC_MAPTILER_KEY` : clé MapTiler injectée au build Next.js
-- `VPS_HOST` : hôte SSH du serveur de prod
-- `VPS_USER` : utilisateur SSH (souvent `root`)
-- `VPS_SSH_KEY` : clé privée SSH (format OpenSSH)
-- `VPS_APP_DIR` : chemin du projet sur le VPS (ex: `/root/cannabinoid-observatory`)
-
 ## Sauvegardes MySQL
 
 Le volume MySQL est persistant. Pour une sauvegarde manuelle :
