@@ -22,4 +22,4 @@ COPY --from=builder /app/apps/web ./apps/web
 COPY --from=builder /app/prisma ./prisma
 WORKDIR /app/apps/web
 EXPOSE 3000
-CMD ["sh", "-c", "npm run db:deploy && npm run start"]
+CMD ["sh", "-c", "npm run db:deploy && npm run db:seed && npm run start"]
