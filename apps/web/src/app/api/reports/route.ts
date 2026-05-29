@@ -134,6 +134,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
+  const dbUser = await db.user.findUnique({ where: { id: session.user.id }, select: { id: true } });
+  if (!dbUser) {
+    return NextResponse.json(
+      { error: "Your session is invalid. Please log out and log back in." },
+      { status: 401 },
+    );
+  }
+
   const limit = rateLimit(`report:${session.user.id}`, RateLimitPolicies.reportSubmit);
   if (!limit.success) {
     return NextResponse.json(
