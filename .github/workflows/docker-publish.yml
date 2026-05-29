@@ -13,6 +13,7 @@ env:
   HOSTINGER_PROJECT: kanamap
   VPS_HOST: 217.65.144.105
   VPS_USER: root
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build-and-push:
@@ -87,7 +88,6 @@ jobs:
           host: ${{ env.VPS_HOST }}
           username: ${{ env.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
-          script_stop: true
           script: |
             set -euo pipefail
             echo "=== Pre-deploy: prune old KanaMap images ==="
