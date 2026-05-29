@@ -78,42 +78,36 @@ export async function PATCH(request: Request, { params }: Params) {
 
     const consumed = parsed.consumed ?? existing.consumed;
     const bought = consumed ? true : existing.bought;
-    const clearEffects = parsed.consumed === false;
 
     await db.$transaction(async (tx) => {
       await tx.report.update({
         where: { id },
         data: {
-          ...(parsed.placeType !== undefined ? { placeType: parsed.placeType } : {}),
-          ...(parsed.placeOtherLabel !== undefined
-            ? { placeOtherLabel: parsed.placeOtherLabel }
-            : {}),
-          ...(parsed.productType !== undefined ? { productType: parsed.productType } : {}),
+          placeType: parsed.placeType ?? existing.placeType,
+          placeOtherLabel: parsed.placeOtherLabel ?? null,
+          productType: parsed.productType ?? existing.productType,
           consumed,
           bought,
-          formOfUse: consumed ? parsed.formOfUse : null,
+          formOfUse: consumed ? (parsed.formOfUse ?? existing.formOfUse) : null,
         },
       });
 
-      if (clearEffects) {
+      if (parsed.positiveEffectIds !== undefined || !consumed) {
         await tx.reportPositiveEffect.deleteMany({ where: { reportId: id } });
-        await tx.reportAdverseEffect.deleteMany({ where: { reportId: id } });
-      }
-
-      if (parsed.positiveEffectIds !== undefined) {
-        await tx.reportPositiveEffect.deleteMany({ where: { reportId: id } });
-        if (parsed.positiveEffectIds.length > 0) {
+        const ids = consumed ? (parsed.positiveEffectIds ?? []) : [];
+        if (ids.length > 0) {
           await tx.reportPositiveEffect.createMany({
-            data: parsed.positiveEffectIds.map((effectId) => ({ reportId: id, effectId })),
+            data: ids.map((effectId) => ({ reportId: id, effectId })),
           });
         }
       }
 
-      if (parsed.adverseEffectIds !== undefined) {
+      if (parsed.adverseEffectIds !== undefined || !consumed) {
         await tx.reportAdverseEffect.deleteMany({ where: { reportId: id } });
-        if (parsed.adverseEffectIds.length > 0) {
+        const ids = consumed ? (parsed.adverseEffectIds ?? []) : [];
+        if (ids.length > 0) {
           await tx.reportAdverseEffect.createMany({
-            data: parsed.adverseEffectIds.map((effectId) => ({ reportId: id, effectId })),
+            data: ids.map((effectId) => ({ reportId: id, effectId })),
           });
         }
       }

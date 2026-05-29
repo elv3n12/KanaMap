@@ -6,7 +6,6 @@ import type {
   PlaceType,
   PositiveEffect,
   ProductType,
-  ProofLevel,
 } from "@prisma/client";
 
 export type CitySuggestion = {
@@ -37,7 +36,6 @@ export type DeclarationData = {
   positiveEffectIds: string[];
   adverseEffectIds: string[];
   goodFaithConfirmed: boolean;
-  proofLevel: ProofLevel;
 };
 
 export const defaultDeclarationData = (): DeclarationData => ({
@@ -52,7 +50,6 @@ export const defaultDeclarationData = (): DeclarationData => ({
   positiveEffectIds: [],
   adverseEffectIds: [],
   goodFaithConfirmed: false,
-  proofLevel: "L1_TESTIMONY",
 });
 
 export type LookupProps = {

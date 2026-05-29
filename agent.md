@@ -666,7 +666,6 @@ Prévoir au minimum les entités suivantes :
 - AdverseEffect
 - Evidence
 - ModerationStatus
-- ProofLevel
 - RightOfReply
 - InstitutionExport
 - AuditLog

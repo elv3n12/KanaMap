@@ -47,8 +47,6 @@ Voir [docs/moderation-policy.md](docs/moderation-policy.md).
 
 Statuts principaux : `PENDING_REVIEW`, `PUBLISHED_LIMITED`, `PUBLISHED`, `REJECTED`, `ARCHIVED`, `CONTESTED`.
 
-Voir aussi [docs/proof-levels.md](docs/proof-levels.md) pour les niveaux de preuve.
-
 ## Développement local
 
 ```bash

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ReportActions } from "@/components/moderation/report-actions";
-import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, PROOF_LEVEL_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
+import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
 import { decryptPII } from "@/lib/crypto";
 import { db } from "@/lib/db";
 import { ObsPanel } from "@/components/ui/obs";
@@ -44,7 +44,6 @@ export default async function AdminReportDetailPage({ params }: Props) {
           ) : null}
           <dl className="mt-6 grid gap-4 md:grid-cols-2">
             <Info label="Product" value={report.productType ? PRODUCT_TYPE_LABELS[report.productType] : "Not specified"} />
-            <Info label="Proof level" value={PROOF_LEVEL_LABELS[report.proofLevel]} />
             <Info
               label="Molecules"
               value={report.molecules.map((item) => `${item.molecule.name} (${item.kind})`).join(", ") || "Not specified"}

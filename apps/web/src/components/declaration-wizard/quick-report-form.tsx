@@ -57,20 +57,20 @@ function toPayload(data: DeclarationData) {
     formOfUse: data.consumed ? data.formOfUse : undefined,
     positiveEffectIds: data.positiveEffectIds,
     adverseEffectIds: data.adverseEffectIds,
-    proofLevel: data.proofLevel,
     wantsContact: false,
   };
 }
 
 function toUpdatePayload(data: DeclarationData) {
+  const consumed = data.consumed === true;
   return {
     placeType: data.placeType,
-    placeOtherLabel: data.placeOtherLabel,
+    placeOtherLabel: data.placeOtherLabel ?? null,
     productType: data.productType,
-    consumed: data.consumed === true,
-    formOfUse: data.consumed === true ? data.formOfUse : undefined,
-    positiveEffectIds: data.positiveEffectIds,
-    adverseEffectIds: data.adverseEffectIds,
+    consumed,
+    formOfUse: consumed ? (data.formOfUse ?? null) : null,
+    positiveEffectIds: consumed ? data.positiveEffectIds : [],
+    adverseEffectIds: consumed ? data.adverseEffectIds : [],
   };
 }
 

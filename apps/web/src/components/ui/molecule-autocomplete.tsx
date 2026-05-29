@@ -31,8 +31,10 @@ export function MoleculeAutocomplete({
 }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const selectedCustomSet = useMemo(
@@ -62,6 +64,21 @@ export function MoleculeAutocomplete({
     const alreadySelected = selectedCustomSet.has(qn);
     return matchesExisting || alreadySelected ? null : raw;
   }, [options, query, selectedCustomSet]);
+
+  const visibleItems = useMemo(() => {
+    const items: { type: "custom"; value: string }[] | { type: "option"; option: MoleculeOption }[] = [];
+    if (canAddCustom) (items as { type: "custom"; value: string }[]).push({ type: "custom", value: canAddCustom });
+    for (const opt of matches) {
+      (items as { type: "option"; option: MoleculeOption }[]).push({ type: "option", option: opt });
+    }
+    return items as ({ type: "custom"; value: string } | { type: "option"; option: MoleculeOption })[];
+  }, [canAddCustom, matches]);
+
+  useEffect(() => {
+    if (activeIndex < 0 || !listRef.current) return;
+    const el = listRef.current.children[activeIndex] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   useEffect(() => {
     function onDocMouseDown(event: MouseEvent) {
@@ -119,6 +136,50 @@ export function MoleculeAutocomplete({
     inputRef.current?.focus();
   }
 
+  function confirmActive() {
+    if (activeIndex < 0 || activeIndex >= visibleItems.length) return false;
+    const item = visibleItems[activeIndex];
+    if (item.type === "custom") {
+      addCustom(item.value);
+    } else {
+      if (!singleSelect && selectedIdSet.has(item.option.id)) return false;
+      addId(item.option.id);
+    }
+    return true;
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      setOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    if (!open) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setOpen(true);
+        setActiveIndex(-1);
+        return;
+      }
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev < visibleItems.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : visibleItems.length - 1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0) {
+        confirmActive();
+      } else if (canAddCustom) {
+        addCustom(canAddCustom);
+      }
+    }
+  }
+
   const pills = useMemo(() => {
     const idPills = options
       .filter((o) => selectedIdSet.has(o.id))
@@ -130,6 +191,11 @@ export function MoleculeAutocomplete({
     }));
     return [...idPills, ...customPills];
   }, [options, removeCustom, removeId, selectedCustomNames, selectedIdSet]);
+
+  const listboxId = `${id}-listbox`;
+
+  const activeDescendant =
+    open && activeIndex >= 0 ? `${id}-opt-${activeIndex}` : undefined;
 
   return (
     <div ref={rootRef}>
@@ -143,18 +209,18 @@ export function MoleculeAutocomplete({
           ref={inputRef}
           id={id}
           value={query}
-          onFocus={() => setOpen(true)}
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listboxId}
+          aria-activedescendant={activeDescendant}
+          aria-autocomplete="list"
+          onFocus={() => { setOpen(true); setActiveIndex(-1); }}
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
+            setActiveIndex(-1);
           }}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setOpen(false);
-            if (e.key === "Enter" && canAddCustom) {
-              e.preventDefault();
-              addCustom(canAddCustom);
-            }
-          }}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder ?? (singleSelect ? "Search for a molecule…" : "Add molecules…")}
           className="min-h-9 w-full rounded bg-transparent p-2 text-sm text-zinc-100 placeholder:text-obs-muted outline-none"
           autoComplete="off"
@@ -184,31 +250,48 @@ export function MoleculeAutocomplete({
 
       {open ? (
         <div className="relative z-[1100]">
-          <div className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md border border-obs-border bg-obs-surface shadow-xl">
-            {canAddCustom ? (
-              <button
-                type="button"
-                className="block w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-violet/20 hover:text-white"
-                onClick={() => addCustom(canAddCustom)}
-              >
-                Add &quot;{canAddCustom}&quot;
-              </button>
+          <ul
+            ref={listRef}
+            id={listboxId}
+            role="listbox"
+            className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md border border-obs-border bg-obs-surface shadow-xl"
+          >
+            {visibleItems.map((item, i) => {
+              if (item.type === "custom") {
+                return (
+                  <li
+                    key="__custom__"
+                    id={`${id}-opt-${i}`}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    className={`cursor-pointer px-3 py-2 text-sm text-zinc-200 ${i === activeIndex ? "bg-obs-violet/20 text-white" : "hover:bg-obs-violet/20 hover:text-white"}`}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    onClick={() => addCustom(item.value)}
+                  >
+                    Add &quot;{item.value}&quot;
+                  </li>
+                );
+              }
+              const disabled = !singleSelect && selectedIdSet.has(item.option.id);
+              return (
+                <li
+                  key={item.option.id}
+                  id={`${id}-opt-${i}`}
+                  role="option"
+                  aria-selected={i === activeIndex}
+                  aria-disabled={disabled || undefined}
+                  className={`cursor-pointer px-3 py-2 text-sm ${disabled ? "text-zinc-200 opacity-40" : `text-zinc-200 ${i === activeIndex ? "bg-obs-violet/20 text-white" : "hover:bg-obs-violet/20 hover:text-white"}`}`}
+                  onMouseEnter={() => !disabled && setActiveIndex(i)}
+                  onClick={() => !disabled && addId(item.option.id)}
+                >
+                  {item.option.name}
+                </li>
+              );
+            })}
+            {visibleItems.length === 0 ? (
+              <li className="px-3 py-3 text-sm text-obs-muted">No results.</li>
             ) : null}
-            {matches.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="block w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-violet/20 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent"
-                onClick={() => addId(opt.id)}
-                disabled={singleSelect ? false : selectedIdSet.has(opt.id)}
-              >
-                {opt.name}
-              </button>
-            ))}
-            {matches.length === 0 && !canAddCustom ? (
-              <p className="px-3 py-3 text-sm text-obs-muted">No results.</p>
-            ) : null}
-          </div>
+          </ul>
         </div>
       ) : null}
     </div>

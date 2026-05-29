@@ -2,7 +2,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <p className="obs-label text-obs-signal">About</p>
-      <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Mission of Cannabinoid Observatory Europe</h1>
+      <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Mission of the European Observatory of NeoCannabinoids</h1>
       <div className="mt-6 space-y-4 rounded-lg border border-obs-border bg-obs-surface p-6 leading-7 text-zinc-300">
         <p>
           Cannabinoid Observatory Europe is a harm-reduction and information project run by an NGO.

@@ -20,8 +20,10 @@ function normalize(value: string) {
 export function TagPicker({ id, label, addLabel, options, selectedIds, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(-1);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
@@ -43,6 +45,12 @@ export function TagPicker({ id, label, addLabel, options, selectedIds, onChange 
     () => options.filter((o) => selectedSet.has(o.id)),
     [options, selectedSet],
   );
+
+  useEffect(() => {
+    if (activeIndex < 0 || !listRef.current) return;
+    const el = listRef.current.children[activeIndex] as HTMLElement | undefined;
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   useEffect(() => {
     function onDocMouseDown(event: MouseEvent) {
@@ -72,6 +80,31 @@ export function TagPicker({ id, label, addLabel, options, selectedIds, onChange 
     setOpen(true);
     requestAnimationFrame(() => inputRef.current?.focus());
   }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      setOpen(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev < matches.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : matches.length - 1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < matches.length) {
+        addId(matches[activeIndex].id);
+      }
+    }
+  }
+
+  const listboxId = `${id}-listbox`;
+  const activeDescendant =
+    open && activeIndex >= 0 ? `${id}-opt-${activeIndex}` : undefined;
 
   return (
     <div ref={rootRef} className="space-y-2">
@@ -104,7 +137,7 @@ export function TagPicker({ id, label, addLabel, options, selectedIds, onChange 
           onClick={openPicker}
           className="inline-flex min-h-9 items-center gap-1.5 rounded border border-dashed border-obs-border bg-obs-surface px-3 py-1.5 text-sm text-zinc-300 transition hover:border-obs-violet hover:text-obs-signal"
           aria-expanded={open}
-          aria-controls={`${id}-listbox`}
+          aria-controls={listboxId}
         >
           <span className="text-base leading-none" aria-hidden>
             +
@@ -122,28 +155,34 @@ export function TagPicker({ id, label, addLabel, options, selectedIds, onChange 
             ref={inputRef}
             id={id}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setOpen(false);
-            }}
+            role="combobox"
+            aria-expanded={true}
+            aria-controls={listboxId}
+            aria-activedescendant={activeDescendant}
+            aria-autocomplete="list"
+            onChange={(e) => { setQuery(e.target.value); setActiveIndex(-1); }}
+            onKeyDown={handleKeyDown}
             placeholder="Search…"
             className="min-h-9 w-full rounded border border-obs-border bg-obs-elevated p-2 text-sm text-zinc-100 placeholder:text-zinc-400 outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80"
             autoComplete="off"
           />
           <ul
-            id={`${id}-listbox`}
+            ref={listRef}
+            id={listboxId}
             role="listbox"
             className="absolute mt-1 max-h-48 w-full overflow-auto rounded-md border border-obs-border bg-obs-surface shadow-xl"
           >
-            {matches.map((opt) => (
-              <li key={opt.id} role="option" aria-selected={false}>
-                <button
-                  type="button"
-                  className="block w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-violet/20 hover:text-white"
-                  onClick={() => addId(opt.id)}
-                >
-                  {opt.label}
-                </button>
+            {matches.map((opt, i) => (
+              <li
+                key={opt.id}
+                id={`${id}-opt-${i}`}
+                role="option"
+                aria-selected={i === activeIndex}
+                className={`cursor-pointer px-3 py-2 text-sm text-zinc-200 ${i === activeIndex ? "bg-obs-violet/20 text-white" : "hover:bg-obs-violet/20 hover:text-white"}`}
+                onMouseEnter={() => setActiveIndex(i)}
+                onClick={() => addId(opt.id)}
+              >
+                {opt.label}
               </li>
             ))}
             {matches.length === 0 ? (

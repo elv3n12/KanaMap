@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { ZonePayload } from "@/lib/report-serializers";
-import { PROOF_LEVEL_LABELS } from "@/lib/constants";
 import { ObsBadge, ObsButton, ObsKpi, ObsPanel } from "@/components/ui/obs";
 import { severityHex, severityCount } from "@/lib/map/severity-scale";
 
@@ -72,30 +71,29 @@ export function ZonePopup({ zone, onClose }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-obs-border pt-3">
-          <span className="obs-label">Max proof level</span>
-          <span className="obs-data-value text-sm font-semibold">
-            {PROOF_LEVEL_LABELS[zone.maxProofLevel]}
-          </span>
-        </div>
-
         <div
           className="h-1 rounded-full"
           style={{ background: severityHex(severity), opacity: 0.85 }}
           aria-hidden
         />
 
-        {zone.ownReportIds.length > 0 ? (
+        {zone.ownReportIds.length === 1 ? (
           <div className="border-t border-obs-border pt-3">
-            {zone.ownReportIds.map((reportId) => (
-              <Link
-                key={reportId}
-                href={`/reports/${reportId}/edit`}
-                className="inline-flex min-h-9 w-full items-center justify-center rounded border border-obs-border bg-obs-elevated px-3 py-2 text-sm font-medium text-obs-signal transition hover:border-obs-violet hover:text-white"
-              >
-                Modify my report
-              </Link>
-            ))}
+            <Link
+              href={`/reports/${zone.ownReportIds[0]}/edit`}
+              className="inline-flex min-h-9 w-full items-center justify-center rounded border border-obs-border bg-obs-elevated px-3 py-2 text-sm font-medium text-obs-signal transition hover:border-obs-violet hover:text-white"
+            >
+              Modify my report
+            </Link>
+          </div>
+        ) : zone.ownReportIds.length > 1 ? (
+          <div className="border-t border-obs-border pt-3">
+            <Link
+              href="/account"
+              className="inline-flex min-h-9 w-full items-center justify-center rounded border border-obs-border bg-obs-elevated px-3 py-2 text-sm font-medium text-obs-signal transition hover:border-obs-violet hover:text-white"
+            >
+              Modify my reports ({zone.ownReportIds.length})
+            </Link>
           </div>
         ) : null}
       </div>

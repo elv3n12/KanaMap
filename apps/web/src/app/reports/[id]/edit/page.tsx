@@ -33,7 +33,6 @@ function reportToFormData(report: LoadedReport): DeclarationData {
     positiveEffectIds: report.positiveEffects.map((e) => e.effectId),
     adverseEffectIds: report.adverseEffects.map((e) => e.effectId),
     goodFaithConfirmed: true,
-    proofLevel: report.proofLevel,
   };
 }
 

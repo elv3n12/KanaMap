@@ -67,14 +67,6 @@ enum ReportStatus {
   CONTESTED
 }
 
-enum ProofLevel {
-  L1_TESTIMONY
-  L2_VISUAL
-  L3_COMMERCIAL_DOC
-  L4_LAB_ANALYSIS
-  L5_SANITARY_SIGNAL
-}
-
 enum MoleculeKind {
   ANNOUNCED
   SUSPECTED
@@ -94,7 +86,6 @@ enum ModerationActionType {
   SUBMIT
   REQUEST_PROOF
   MASK_ADDRESS
-  CHANGE_PROOF_LEVEL
   PUBLISH_LIMITED
   PUBLISH
   REJECT
@@ -310,7 +301,6 @@ model Report {
   observationDate      DateTime     @map("observation_date")
   narrative            String?      @db.Text
   moderationStatus     ReportStatus @default(PENDING_REVIEW) @map("moderation_status")
-  proofLevel           ProofLevel   @default(L1_TESTIMONY) @map("proof_level")
   exactAddressEncrypted String?     @db.Text @map("exact_address_encrypted")
   exactLat             Float?       @map("exact_lat")
   exactLng             Float?       @map("exact_lng")
@@ -341,7 +331,7 @@ model Report {
   evidence Evidence[]
   moderationActions ModerationAction[]
 
-  @@index([moderationStatus, proofLevel])
+  @@index([moderationStatus])
   @@index([locationId, moderationStatus])
   @@index([createdById])
   @@map("reports")
@@ -434,7 +424,6 @@ model AdverseEffectDeclaration {
   contactEmailEncrypted String?     @db.Text @map("contact_email_encrypted")
   narrative            String?      @db.Text
   moderationStatus     ReportStatus @default(PENDING_REVIEW) @map("moderation_status")
-  proofLevel           ProofLevel   @default(L1_TESTIMONY) @map("proof_level")
   createdAt            DateTime     @default(now()) @map("created_at")
   updatedAt            DateTime     @updatedAt @map("updated_at")
 
@@ -447,7 +436,7 @@ model AdverseEffectDeclaration {
   evidence Evidence[]
   moderationActions ModerationAction[]
 
-  @@index([moderationStatus, proofLevel])
+  @@index([moderationStatus])
   @@map("adverse_effect_declarations")
 }
 

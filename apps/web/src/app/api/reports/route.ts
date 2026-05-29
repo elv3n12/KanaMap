@@ -253,7 +253,6 @@ export async function POST(request: Request) {
         narrative: scrubPublicText(narrative),
         moderationStatus: "PUBLISHED",
         publishedAt: new Date(),
-        proofLevel: parsed.proofLevel,
         exactAddressEncrypted: sanitized.exactAddress ? encryptPII(sanitized.exactAddress) : null,
         exactLat: sanitized.exactLat,
         exactLng: sanitized.exactLng,

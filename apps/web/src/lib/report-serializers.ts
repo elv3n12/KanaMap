@@ -10,8 +10,6 @@ import type {
   ReportMarketingClaim,
   ReportMolecule,
 } from "@prisma/client";
-import { maxProofLevel } from "@/lib/proof-level";
-
 export type PublicReport = Report & {
   location: Location;
   product: Product | null;
@@ -36,7 +34,6 @@ export function serializePublicReport(report: PublicReport) {
     observationDate: report.observationDate.toISOString(),
     narrative: report.narrative,
     moderationStatus: report.moderationStatus,
-    proofLevel: report.proofLevel,
     publishedAt: report.publishedAt?.toISOString() ?? null,
     molecules: report.molecules.map((item) => ({
       id: item.molecule.id,
@@ -61,7 +58,6 @@ export function serializeZoneAggregate(
   const productTypes = new Set<string>();
   const effects = new Set<string>();
   const statuses = new Set<string>();
-  const proofLevels = reports.map((report) => report.proofLevel);
 
   for (const report of reports) {
     report.molecules.forEach((item) => molecules.set(item.molecule.id, item.molecule.name));
@@ -88,7 +84,6 @@ export function serializeZoneAggregate(
     productTypes: Array.from(productTypes),
     adverseEffects: Array.from(effects),
     statuses: Array.from(statuses),
-    maxProofLevel: maxProofLevel(proofLevels),
     ownReportIds,
   };
 }

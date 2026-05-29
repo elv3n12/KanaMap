@@ -5,7 +5,6 @@ import type {
   InformationSource,
   PlaceType,
   ProductType,
-  ProofLevel,
   ReportStatus,
 } from "@prisma/client";
 
@@ -44,14 +43,6 @@ export const FORM_OF_USE_LABELS: Record<FormOfUse, string> = {
   OTHER: "Other",
 };
 
-export const PROOF_LEVEL_LABELS: Record<ProofLevel, string> = {
-  L1_TESTIMONY: "To be verified",
-  L2_VISUAL: "Partially documented",
-  L3_COMMERCIAL_DOC: "Commercial documentation",
-  L4_LAB_ANALYSIS: "Lab analysis available",
-  L5_SANITARY_SIGNAL: "Associated health signal",
-};
-
 export const REPORT_STATUS_LABELS: Record<ReportStatus, string> = {
   DRAFT: "Draft",
   SUBMITTED: "Submitted",
@@ -74,8 +65,6 @@ export const EVIDENCE_TYPE_LABELS: Record<EvidenceType, string> = {
 export const PLACE_TYPES = Object.keys(PLACE_TYPE_LABELS) as PlaceType[];
 export const PRODUCT_TYPES = Object.keys(PRODUCT_TYPE_LABELS) as ProductType[];
 export const FORM_OF_USE_TYPES = Object.keys(FORM_OF_USE_LABELS) as FormOfUse[];
-export const PROOF_LEVELS = Object.keys(PROOF_LEVEL_LABELS) as ProofLevel[];
-
 export const DRUGS_INFO_SERVICE_PHONE = "0 800 23 13 13";
 export const EMERGENCY_PHONE_FR = "15";
 export const EMERGENCY_PHONE_EU = "112";

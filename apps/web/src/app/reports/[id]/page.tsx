@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, PROOF_LEVEL_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
+import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
 import { serializePublicReport } from "@/lib/report-serializers";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,6 @@ export default async function PublicReportPage({ params }: Props) {
       </p>
       <div className="mt-6 grid gap-4 rounded-lg border border-obs-border bg-obs-surface p-6 md:grid-cols-2">
         <Info label="Product type" value={publicReport.productType ? PRODUCT_TYPE_LABELS[publicReport.productType] : "Not specified"} />
-        <Info label="Proof level" value={PROOF_LEVEL_LABELS[publicReport.proofLevel]} />
         <Info label="Status" value={REPORT_STATUS_LABELS[publicReport.moderationStatus]} />
         <Info label="Observation date" value={new Date(publicReport.observationDate).toLocaleDateString("en-GB")} />
         <Info label="Declared molecules" value={publicReport.molecules.map((item) => `${item.name} (${item.kind.toLowerCase()})`).join(", ") || "Not specified"} />

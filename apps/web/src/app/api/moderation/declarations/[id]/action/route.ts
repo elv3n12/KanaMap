@@ -21,15 +21,12 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   const nextStatus = actionToStatus(body.action);
-  const nextProofLevel =
-    body.action === "CHANGE_PROOF_LEVEL" && body.proofLevel ? body.proofLevel : declaration.proofLevel;
 
   await db.$transaction([
     db.adverseEffectDeclaration.update({
       where: { id },
       data: {
         ...(nextStatus ? { moderationStatus: nextStatus } : {}),
-        proofLevel: nextProofLevel,
       },
     }),
     db.moderationAction.create({
@@ -49,7 +46,6 @@ export async function POST(request: Request, { params }: Params) {
         action: `moderation.declaration.${body.action.toLowerCase()}`,
         targetType: "adverse_effect_declaration",
         targetId: id,
-        metadata: { proofLevel: nextProofLevel },
       },
     }),
   ]);

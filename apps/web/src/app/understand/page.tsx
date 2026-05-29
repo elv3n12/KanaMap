@@ -131,7 +131,7 @@ export default function UnderstandPage() {
           <ObsSectionHeader eyebrow="Section 04" title="Methodology" />
           <div className="mt-6 max-w-prose space-y-4 text-sm leading-7 text-zinc-400">
             <p>
-              Each report carries a proof level. Zones are deliberately approximate. Moderation
+              Each report documents an observation. Zones are deliberately approximate. Moderation
               validates submissions before public display.
             </p>
           </div>

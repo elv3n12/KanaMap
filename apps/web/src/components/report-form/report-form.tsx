@@ -7,7 +7,6 @@ import {
   FORM_OF_USE_LABELS,
   PLACE_TYPE_LABELS,
   PRODUCT_TYPE_LABELS,
-  PROOF_LEVEL_LABELS,
 } from "@/lib/constants";
 import { ObsButton } from "@/components/ui/obs";
 
@@ -264,17 +263,10 @@ export function ReportForm({ molecules, claims, effects }: Props) {
         </div>
       </section>
 
-      {/* Step 4: Niveau de preuve */}
+      {/* Step 4: Observation details */}
       <section>
-        <h2 className="text-lg font-semibold text-zinc-100">4. Niveau de preuve</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">4. Observation details</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <select name="proofLevel" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
-            {Object.entries(PROOF_LEVEL_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
           <input required name="observationDate" type="date" defaultValue={today} className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100" />
         </div>
         <textarea

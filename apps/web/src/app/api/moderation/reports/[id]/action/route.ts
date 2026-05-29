@@ -36,14 +36,12 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   const nextStatus = actionToStatus(body.action);
-  const nextProofLevel = body.action === "CHANGE_PROOF_LEVEL" && body.proofLevel ? body.proofLevel : report.proofLevel;
 
   await db.$transaction([
     db.report.update({
       where: { id },
       data: {
         ...(nextStatus ? { moderationStatus: nextStatus } : {}),
-        proofLevel: nextProofLevel,
         ...(nextStatus === "PUBLISHED" ? { publishedAt: new Date() } : {}),
         ...(body.action === "MASK_ADDRESS" ? { exactAddressEncrypted: null, exactLat: null, exactLng: null } : {}),
       },
@@ -65,7 +63,6 @@ export async function POST(request: Request, { params }: Params) {
         action: `moderation.${body.action.toLowerCase()}`,
         targetType: "report",
         targetId: id,
-        metadata: { proofLevel: nextProofLevel },
       },
     }),
   ]);

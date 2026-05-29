@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PlaceType, ProductType, ProofLevel, ReportStatus } from "@prisma/client";
+import { PlaceType, ProductType, ReportStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { publicStatuses } from "@/lib/moderation";
@@ -28,9 +28,12 @@ export async function GET(request: Request) {
     .split(",")
     .map((x) => x.trim())
     .filter(Boolean);
+  const placeTypes = (url.searchParams.get("placeTypes") || "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean) as PlaceType[];
   const placeType = (url.searchParams.get("placeType") as PlaceType | null) || undefined;
   const productType = (url.searchParams.get("productType") as ProductType | null) || undefined;
-  const proofLevel = (url.searchParams.get("proofLevel") as ProofLevel | null) || undefined;
   const status = (url.searchParams.get("status") as ReportStatus | null) || undefined;
   const effectId = url.searchParams.get("effectId") || undefined;
   const from = url.searchParams.get("from");
@@ -52,9 +55,12 @@ export async function GET(request: Request) {
       ...(countryCode ? { location: { countryCode } } : {}),
       ...(city ? { location: { city: { contains: city } } } : {}),
       ...(moleculeOr.length > 0 ? { OR: moleculeOr } : {}),
-      ...(placeType ? { placeType } : {}),
+      ...(placeTypes.length > 0
+        ? { placeType: { in: placeTypes } }
+        : placeType
+          ? { placeType }
+          : {}),
       ...(productType ? { productType } : {}),
-      ...(proofLevel ? { proofLevel } : {}),
       ...(effectId ? { adverseEffects: { some: { effectId } } } : {}),
       ...(from || to
         ? {

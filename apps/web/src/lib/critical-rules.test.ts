@@ -23,7 +23,6 @@ const baseReport = {
   observationDate: new Date("2026-05-01"),
   narrative: "Observation fictive",
   moderationStatus: "PUBLISHED",
-  proofLevel: "L2_VISUAL",
   exactAddressEncrypted: "secret",
   exactLat: 48.85,
   exactLng: 2.35,

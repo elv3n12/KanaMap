@@ -25,7 +25,7 @@ export default function ContactPage() {
             <div className="mt-4 space-y-3 text-sm leading-6 text-zinc-400">
               <p>
                 The observatory tracks affected zones, reported molecules, commercial forms,
-                marketing claims, proof levels, and adverse effects.
+                marketing claims, and adverse effects.
               </p>
               <p>
                 Public exports are anonymized. Sensitive data remains reserved for moderation.

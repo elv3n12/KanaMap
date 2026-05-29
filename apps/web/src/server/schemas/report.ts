@@ -7,7 +7,6 @@ import {
   PlaceType,
   PriceMode,
   ProductType,
-  ProofLevel,
 } from "@prisma/client";
 import { z } from "zod";
 
@@ -59,7 +58,6 @@ export const reportSchema = z
     priceMode: z.nativeEnum(PriceMode).optional(),
     observationDate: z.coerce.date().default(() => new Date()),
     narrative: z.string().trim().max(5000).optional(),
-    proofLevel: z.nativeEnum(ProofLevel).default("L1_TESTIMONY"),
     announcedMoleculeIds: z.array(z.string().min(1).max(64)).max(30).default([]),
     suspectedMoleculeIds: z.array(z.string().min(1).max(64)).max(30).default([]),
     announcedMoleculeNames: z.array(z.string().trim().min(1).max(80)).max(10).default([]),
@@ -142,10 +140,10 @@ export type ReportInput = z.infer<typeof reportSchema>;
 export const reportUpdateSchema = z
   .object({
     placeType: z.nativeEnum(PlaceType).optional(),
-    placeOtherLabel: z.string().trim().optional(),
+    placeOtherLabel: z.string().trim().nullable().optional(),
     productType: z.nativeEnum(ProductType).optional(),
     consumed: boolField.optional(),
-    formOfUse: z.nativeEnum(FormOfUse).optional(),
+    formOfUse: z.nativeEnum(FormOfUse).nullable().optional(),
     positiveEffectIds: z.array(z.string().min(1).max(64)).max(30).optional(),
     adverseEffectIds: z.array(z.string().min(1).max(64)).max(30).optional(),
   })
@@ -209,7 +207,6 @@ export const moderationActionSchema = z.object({
   action: z.enum([
     "REQUEST_PROOF",
     "MASK_ADDRESS",
-    "CHANGE_PROOF_LEVEL",
     "PUBLISH_LIMITED",
     "PUBLISH",
     "REJECT",
@@ -217,7 +214,6 @@ export const moderationActionSchema = z.object({
     "CONTEST",
     "NOTE",
   ]),
-  proofLevel: z.nativeEnum(ProofLevel).optional(),
   notes: z.string().trim().max(3000).optional(),
 });
 
@@ -271,7 +267,6 @@ export function parseReportFormData(formData: FormData) {
     priceMode: formData.get("priceMode") || undefined,
     observationDate: formData.get("observationDate"),
     narrative: formData.get("narrative") || undefined,
-    proofLevel: formData.get("proofLevel") || "L1_TESTIMONY",
     announcedMoleculeIds: formDataArray(formData, "announcedMoleculeIds"),
     suspectedMoleculeIds: formDataArray(formData, "suspectedMoleculeIds"),
     announcedMoleculeNames: formDataArray(formData, "announcedMoleculeNames"),
