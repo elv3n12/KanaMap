@@ -3,10 +3,14 @@ name: Build & Push Docker Image
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  HOSTINGER_API_BASE: https://developers.hostinger.com
+  HOSTINGER_VM_ID: "1339684"
+  HOSTINGER_PROJECT: kanamap
 
 jobs:
   build-and-push:
@@ -49,3 +53,43 @@ jobs:
             NEXT_PUBLIC_MAPTILER_KEY=${{ secrets.NEXT_PUBLIC_MAPTILER_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require Hostinger API token
+        env:
+          TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::HOSTINGER_API_TOKEN is not set. See docs/DEPLOY_PRODUCTION.md"
+            exit 1
+          fi
+
+      - name: Trigger Hostinger deploy
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          UPDATE_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/update"
+          echo "Triggering deploy: $UPDATE_URL"
+          curl -fsS -X POST "$UPDATE_URL" \
+            -H "Authorization: Bearer ${HOSTINGER_API_TOKEN}" \
+            -H "Content-Type: application/json"
+          echo "Deploy triggered for commit ${GITHUB_SHA}"
+
+      - name: Wait for containers
+        run: sleep 90
+
+      - name: Verify web container is running
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          CONTAINERS_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/containers"
+          BODY=$(curl -fsS "$CONTAINERS_URL" \
+            -H "Authorization: Bearer ${HOSTINGER_API_TOKEN}")
+          echo "$BODY" | jq -e '.[] | select(.name == "kanamap-web-1") | .status | test("Up")' > /dev/null
+          echo "kanamap-web-1 is up"
+          echo "$BODY" | jq '.[] | {name, status, image}'
