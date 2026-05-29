@@ -3,6 +3,7 @@ import { ReportActions } from "@/components/moderation/report-actions";
 import { PLACE_TYPE_LABELS, PRODUCT_TYPE_LABELS, PROOF_LEVEL_LABELS, REPORT_STATUS_LABELS } from "@/lib/constants";
 import { decryptPII } from "@/lib/crypto";
 import { db } from "@/lib/db";
+import { ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -27,16 +28,16 @@ export default async function AdminReportDetailPage({ params }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <main className="space-y-6">
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold">{report.productCommercialName ?? "Observed product"}</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            {report.location.displayZone} · {PLACE_TYPE_LABELS[report.placeType]} ·{" "}
-            {REPORT_STATUS_LABELS[report.moderationStatus]}
+        <ObsPanel className="p-6">
+          <p className="obs-label text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</p>
+          <h1 className="mt-2 text-2xl font-semibold text-zinc-100">{report.productCommercialName ?? "Observed product"}</h1>
+          <p className="mt-2 text-sm text-zinc-400">
+            {report.location.displayZone} · {PLACE_TYPE_LABELS[report.placeType]}
           </p>
           {report.createdBy ? (
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-zinc-400">
               Author:{" "}
-              <a className="text-blue-700 underline" href={`/admin/users/${report.createdBy.id}`}>
+              <a className="text-obs-signal hover:underline" href={`/admin/users/${report.createdBy.id}`}>
                 {report.createdBy.email}
               </a>
             </p>
@@ -55,25 +56,27 @@ export default async function AdminReportDetailPage({ params }: Props) {
             <Info
               label="Effects"
               value={report.adverseEffects.map((item) => item.effect.label).join(", ") || "None reported"}
+              highlight={report.adverseEffects.length > 0}
             />
             <Info
               label="Moderation address"
               value={decryptPII(report.exactAddressEncrypted) ?? "Not provided or masked"}
             />
           </dl>
-          {report.narrative ? <p className="mt-6 whitespace-pre-line leading-7 text-slate-700">{report.narrative}</p> : null}
-        </section>
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">History</h2>
+          {report.narrative ? <p className="mt-6 whitespace-pre-line leading-7 text-zinc-300">{report.narrative}</p> : null}
+        </ObsPanel>
+        <ObsPanel className="p-6">
+          <h2 className="text-lg font-semibold text-zinc-100">History</h2>
           <div className="mt-4 space-y-2 text-sm">
             {report.moderationActions.map((action) => (
-              <p key={action.id} className="rounded-lg bg-slate-50 p-2">
-                {action.action} · {action.moderator?.email ?? "system"} · {action.createdAt.toLocaleString("en-GB")}{" "}
-                · {action.notes ?? ""}
+              <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
+                <span className="text-obs-signal">{action.action}</span> · {action.moderator?.email ?? "system"} ·{" "}
+                <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
+                {action.notes ? <span className="text-zinc-500"> · {action.notes}</span> : null}
               </p>
             ))}
           </div>
-        </section>
+        </ObsPanel>
       </main>
       <aside>
         <ReportActions reportId={report.id} />
@@ -82,11 +85,11 @@ export default async function AdminReportDetailPage({ params }: Props) {
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Info({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div>
-      <dt className="text-sm font-medium text-slate-500">{label}</dt>
-      <dd className="mt-1 text-sm">{value}</dd>
+      <dt className="obs-label text-zinc-500">{label}</dt>
+      <dd className={`mt-1 text-sm ${highlight ? "text-red-400" : "text-zinc-300"}`}>{value}</dd>
     </div>
   );
 }

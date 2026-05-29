@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { canAccessAdmin, getAdminCounts, USER_ROLE_LABELS } from "@/lib/admin";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
-import { btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -37,8 +37,9 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Dashboard</h1>
-        <p className="mt-2 text-slate-700">Overview of moderation and activity.</p>
+        <p className="obs-label text-obs-signal">Admin</p>
+        <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Dashboard</h1>
+        <p className="mt-1 text-sm text-zinc-400">Overview of moderation and activity.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -54,63 +55,63 @@ export default async function AdminDashboardPage() {
         <StatCard label="Users" value={counts.totalUsers} href="/admin/users" adminOnly />
       </div>
 
-      <p className="text-sm text-slate-600">{roleSummary || "No users."}</p>
+      <p className="text-sm text-zinc-500">{roleSummary || "No users."}</p>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900">Latest published reports</h2>
-        <div className="mt-4 divide-y divide-slate-200">
+      <ObsPanel className="p-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Latest published reports</h2>
+        <div className="mt-4 divide-y divide-obs-border">
           {recentPublished.length === 0 ? (
-            <p className="py-3 text-sm text-slate-600">No published reports.</p>
+            <p className="py-3 text-sm text-zinc-500">No published reports.</p>
           ) : (
             recentPublished.map((report) => (
               <div key={report.id} className="flex items-center justify-between gap-4 py-3">
                 <div>
-                  <p className="font-medium">{report.productCommercialName ?? "Observed product"}</p>
-                  <p className="text-sm text-slate-600">
-                    {report.location.displayZone} · {REPORT_STATUS_LABELS[report.moderationStatus]}
+                  <p className="font-medium text-zinc-200">{report.productCommercialName ?? "Observed product"}</p>
+                  <p className="text-sm text-zinc-400">
+                    {report.location.displayZone} · <span className="text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</span>
                   </p>
                 </div>
-                <Link className={btnSecondary} href={`/admin/reports/${report.id}`}>
-                  Review
+                <Link href={`/admin/reports/${report.id}`}>
+                  <ObsButton variant="outline">Review</ObsButton>
                 </Link>
               </div>
             ))
           )}
         </div>
-      </section>
+      </ObsPanel>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">Recent moderation actions</h2>
+        <ObsPanel className="p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Recent moderation actions</h2>
           <div className="mt-4 space-y-2 text-sm">
             {recentActions.length === 0 ? (
-              <p className="text-slate-600">No recent actions.</p>
+              <p className="text-zinc-500">No recent actions.</p>
             ) : (
               recentActions.map((action) => (
-                <p key={action.id} className="rounded-lg bg-slate-50 p-2">
-                  {action.action}
+                <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
+                  <span className="text-obs-signal">{action.action}</span>
                   {action.report?.productCommercialName ? ` · ${action.report.productCommercialName}` : ""}
                   {" · "}
-                  {action.moderator?.email ?? "system"}
+                  <span className="text-zinc-500">{action.moderator?.email ?? "system"}</span>
                   {" · "}
-                  {action.createdAt.toLocaleString("en-GB")}
+                  <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
                 </p>
               ))
             )}
           </div>
-        </section>
+        </ObsPanel>
 
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-slate-900">Recent signups</h2>
+        <ObsPanel className="p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Recent signups</h2>
           <div className="mt-4 space-y-2 text-sm">
             {recentUsers.map((user) => (
-              <p key={user.id} className="rounded-lg bg-slate-50 p-2">
-                {user.email} · {USER_ROLE_LABELS[user.role]} ·{" "}
-                {user.createdAt.toLocaleDateString("en-GB")}
+              <p key={user.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
+                {user.email} · <span className="text-obs-signal">{USER_ROLE_LABELS[user.role]}</span> ·{" "}
+                <span className="text-zinc-500">{user.createdAt.toLocaleDateString("en-GB")}</span>
               </p>
             ))}
           </div>
-        </section>
+        </ObsPanel>
       </div>
     </div>
   );
@@ -132,13 +133,13 @@ function StatCard({
   return (
     <Link
       href={href}
-      className={`rounded-2xl border p-5 shadow-sm transition hover:border-slate-300 ${
-        highlight ? "border-rose-300 bg-rose-50" : "border-slate-200 bg-white"
+      className={`rounded-lg border p-4 transition hover:border-obs-violet ${
+        highlight ? "border-amber-500/50 bg-amber-950/30" : "border-obs-border bg-obs-surface"
       }`}
     >
-      <p className="text-sm font-medium text-slate-600">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-slate-900">{value}</p>
-      {adminOnly ? <p className="mt-1 text-xs text-slate-500">Admin only</p> : null}
+      <p className="obs-label text-zinc-400">{label}</p>
+      <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">{value}</p>
+      {adminOnly ? <p className="mt-1 text-xs text-zinc-500">Admin only</p> : null}
     </Link>
   );
 }

@@ -12,7 +12,7 @@ import {
 import { USER_ROLE_LABELS } from "@/lib/admin";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
-import { btnDestructive, btnPrimary, btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -37,43 +37,48 @@ export default async function AdminUserDetailPage({ params }: Props) {
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/admin/utilisateurs" className="text-sm text-blue-700 underline">
-          ← Retour aux utilisateurs
+        <Link href="/admin/users" className="text-sm text-obs-signal hover:underline">
+          ← Back to users
         </Link>
-        <h1 className="mt-2 text-3xl font-semibold text-slate-900">{user.email}</h1>
-        <p className="mt-1 text-slate-600">
-          {USER_ROLE_LABELS[user.role]} · {user.bannedAt ? "Suspendu" : "Actif"} ·{" "}
-          {user.emailVerifiedAt ? "Email vérifié" : "Email non vérifié"}
+        <h1 className="mt-2 text-2xl font-semibold text-zinc-100">{user.email}</h1>
+        <p className="mt-1 text-sm text-zinc-400">
+          <span className="text-obs-signal">{USER_ROLE_LABELS[user.role]}</span> ·{" "}
+          <span className={user.bannedAt ? "text-red-400" : "text-emerald-400"}>{user.bannedAt ? "Suspended" : "Active"}</span> ·{" "}
+          {user.emailVerifiedAt ? "Email verified" : "Email not verified"}
         </p>
       </div>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">Informations</h2>
-        <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+      <ObsPanel className="p-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Information</h2>
+        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-slate-500">Inscription</dt>
-            <dd>{user.createdAt.toLocaleString("fr-FR")}</dd>
+            <dt className="obs-label text-zinc-500">Joined</dt>
+            <dd className="text-zinc-300">{user.createdAt.toLocaleString("en-GB")}</dd>
           </div>
           <div>
-            <dt className="text-slate-500">Charte acceptée</dt>
-            <dd>{user.charterAcceptedAt?.toLocaleDateString("fr-FR") ?? "—"}</dd>
+            <dt className="obs-label text-zinc-500">Charter accepted</dt>
+            <dd className="text-zinc-300">{user.charterAcceptedAt?.toLocaleDateString("en-GB") ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-slate-500">Suspension</dt>
-            <dd>{user.bannedAt?.toLocaleString("fr-FR") ?? "—"}</dd>
+            <dt className="obs-label text-zinc-500">Suspended</dt>
+            <dd className="text-zinc-300">{user.bannedAt?.toLocaleString("en-GB") ?? "—"}</dd>
           </div>
         </dl>
-      </section>
+      </ObsPanel>
 
       {!isSelf ? (
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold">Actions</h2>
+        <ObsPanel className="p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Actions</h2>
           <div className="mt-4 flex flex-wrap gap-4">
             <form action={updateRoleAction} className="flex items-end gap-2">
               <input type="hidden" name="userId" value={user.id} />
               <label className="text-sm">
-                <span className="font-medium">Rôle</span>
-                <select name="role" defaultValue={user.role} className="mt-1 block rounded-lg border p-2">
+                <span className="obs-label mb-1 block text-zinc-300">Role</span>
+                <select
+                  name="role"
+                  defaultValue={user.role}
+                  className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100"
+                >
                   {Object.values(UserRole).map((role) => (
                     <option key={role} value={role}>
                       {USER_ROLE_LABELS[role]}
@@ -81,95 +86,101 @@ export default async function AdminUserDetailPage({ params }: Props) {
                   ))}
                 </select>
               </label>
-              <button type="submit" className={btnPrimary}>
-                Mettre à jour
-              </button>
+              <ObsButton type="submit" variant="primary">
+                Update
+              </ObsButton>
             </form>
 
             {!user.emailVerifiedAt ? (
               <form action={forceVerifyEmailAction}>
                 <input type="hidden" name="userId" value={user.id} />
-                <button type="submit" className={btnSecondary}>
-                  Forcer vérification email
-                </button>
+                <ObsButton type="submit" variant="outline">
+                  Force verify email
+                </ObsButton>
               </form>
             ) : null}
 
             {user.bannedAt ? (
               <form action={unsuspendUserAction}>
                 <input type="hidden" name="userId" value={user.id} />
-                <button type="submit" className={btnSecondary}>
-                  Réactiver le compte
-                </button>
+                <ObsButton type="submit" variant="outline">
+                  Reactivate account
+                </ObsButton>
               </form>
             ) : (
               <form action={suspendUserAction} className="flex flex-col gap-2 sm:flex-row sm:items-end">
                 <input type="hidden" name="userId" value={user.id} />
                 <label className="text-sm">
-                  <span className="font-medium">Motif suspension</span>
-                  <input name="reason" className="mt-1 block rounded-lg border p-2" placeholder="Optionnel" />
+                  <span className="obs-label mb-1 block text-zinc-300">Suspension reason</span>
+                  <input
+                    name="reason"
+                    className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-500"
+                    placeholder="Optional"
+                  />
                 </label>
-                <button type="submit" className={btnDestructive}>
-                  Suspendre
-                </button>
+                <ObsButton type="submit" variant="danger">
+                  Suspend
+                </ObsButton>
               </form>
             )}
 
             <form action={deleteUserAction}>
               <input type="hidden" name="userId" value={user.id} />
-              <button type="submit" className={btnDestructive}>
-                Supprimer définitivement
-              </button>
+              <ObsButton type="submit" variant="danger">
+                Delete permanently
+              </ObsButton>
             </form>
           </div>
-        </section>
+        </ObsPanel>
       ) : (
-        <p className="text-sm text-slate-600">Vous ne pouvez pas modifier votre propre compte depuis cette page.</p>
+        <p className="text-sm text-zinc-500">You cannot modify your own account from this page.</p>
       )}
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">Signalements ({user.reports.length})</h2>
-        <div className="mt-4 divide-y">
+      <ObsPanel className="p-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Reports ({user.reports.length})</h2>
+        <div className="mt-4 divide-y divide-obs-border">
           {user.reports.length === 0 ? (
-            <p className="py-3 text-sm text-slate-600">Aucun signalement.</p>
+            <p className="py-3 text-sm text-zinc-500">No reports.</p>
           ) : (
             user.reports.map((report) => (
               <div key={report.id} className="flex items-center justify-between gap-4 py-3">
                 <div>
-                  <p className="font-medium">{report.productCommercialName ?? "Produit observé"}</p>
-                  <p className="text-sm text-slate-600">
-                    {report.location.displayZone} · {REPORT_STATUS_LABELS[report.moderationStatus]}
+                  <p className="font-medium text-zinc-200">{report.productCommercialName ?? "Observed product"}</p>
+                  <p className="text-sm text-zinc-400">
+                    {report.location.displayZone} · <span className="text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</span>
                   </p>
                 </div>
-                <Link className={btnSecondary} href={`/admin/signalements/${report.id}`}>
-                  Voir
+                <Link href={`/admin/reports/${report.id}`}>
+                  <ObsButton variant="ghost">View</ObsButton>
                 </Link>
               </div>
             ))
           )}
         </div>
-      </section>
+      </ObsPanel>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">Déclarations ({user.declarations.length})</h2>
-        <div className="mt-4 divide-y">
+      <ObsPanel className="p-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Declarations ({user.declarations.length})</h2>
+        <div className="mt-4 divide-y divide-obs-border">
           {user.declarations.length === 0 ? (
-            <p className="py-3 text-sm text-slate-600">Aucune déclaration.</p>
+            <p className="py-3 text-sm text-zinc-500">No declarations.</p>
           ) : (
             user.declarations.map((declaration) => (
               <div key={declaration.id} className="flex items-center justify-between gap-4 py-3">
                 <div>
-                  <p className="font-medium">{declaration.productNameRaw ?? "Produit non précisé"}</p>
-                  <p className="text-sm text-slate-600">{REPORT_STATUS_LABELS[declaration.moderationStatus]}</p>
+                  <p className="font-medium text-zinc-200">{declaration.productNameRaw ?? "Unspecified product"}</p>
+                  <p className="text-sm text-zinc-400">
+                    <span className="text-obs-signal">{REPORT_STATUS_LABELS[declaration.moderationStatus]}</span>
+                  </p>
                 </div>
-                <Link className={btnSecondary} href={`/admin/declarations/${declaration.id}`}>
-                  Voir
+                <Link href={`/admin/declarations/${declaration.id}`}>
+                  <ObsButton variant="ghost">View</ObsButton>
                 </Link>
               </div>
             ))
           )}
         </div>
-      </section>
+      </ObsPanel>
     </div>
   );
 }

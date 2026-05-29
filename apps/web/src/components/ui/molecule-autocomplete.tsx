@@ -183,12 +183,12 @@ export function MoleculeAutocomplete({
       ) : null}
 
       {open ? (
-        <div className="relative">
-          <div className="obs-panel absolute z-[1000] mt-2 max-h-64 w-full overflow-auto">
+        <div className="relative z-[1100]">
+          <div className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md border border-obs-border bg-obs-surface shadow-xl">
             {canAddCustom ? (
               <button
                 type="button"
-                className="block w-full px-4 py-2 text-left text-sm text-zinc-200 hover:bg-obs-elevated"
+                className="block w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-violet/20 hover:text-white"
                 onClick={() => addCustom(canAddCustom)}
               >
                 Add &quot;{canAddCustom}&quot;
@@ -198,7 +198,7 @@ export function MoleculeAutocomplete({
               <button
                 key={opt.id}
                 type="button"
-                className="block w-full px-4 py-2 text-left text-sm text-zinc-200 hover:bg-obs-elevated disabled:opacity-40"
+                className="block w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-violet/20 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent"
                 onClick={() => addId(opt.id)}
                 disabled={singleSelect ? false : selectedIdSet.has(opt.id)}
               >
@@ -206,7 +206,7 @@ export function MoleculeAutocomplete({
               </button>
             ))}
             {matches.length === 0 && !canAddCustom ? (
-              <p className="px-4 py-3 text-sm text-obs-muted">No results.</p>
+              <p className="px-3 py-3 text-sm text-obs-muted">No results.</p>
             ) : null}
           </div>
         </div>

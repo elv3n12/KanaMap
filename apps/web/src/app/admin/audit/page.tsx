@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -44,60 +44,69 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Journal d&apos;audit</h1>
-        <p className="mt-2 text-slate-700">{total} entrée(s) au total.</p>
+        <p className="obs-label text-obs-signal">Admin</p>
+        <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Audit Log</h1>
+        <p className="mt-1 text-sm text-zinc-400">{total} total entries.</p>
       </div>
 
-      <form className="flex flex-wrap gap-3 rounded-2xl bg-white p-4 shadow-sm" method="get">
-        <label className="text-sm">
-          <span className="font-medium text-slate-700">Action</span>
-          <input name="action" defaultValue={actionFilter} className="mt-1 block rounded-lg border p-2" />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium text-slate-700">Type cible</span>
-          <input name="targetType" defaultValue={targetType} className="mt-1 block rounded-lg border p-2" />
-        </label>
-        <div className="flex items-end">
-          <button type="submit" className={btnSecondary}>
-            Filtrer
-          </button>
-        </div>
-      </form>
+      <ObsPanel className="p-4">
+        <form className="flex flex-wrap gap-3" method="get">
+          <label className="text-sm">
+            <span className="obs-label mb-1 block text-zinc-300">Action</span>
+            <input
+              name="action"
+              defaultValue={actionFilter}
+              className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="obs-label mb-1 block text-zinc-300">Target type</span>
+            <input
+              name="targetType"
+              defaultValue={targetType}
+              className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100"
+            />
+          </label>
+          <div className="flex items-end">
+            <ObsButton type="submit" variant="outline">
+              Filter
+            </ObsButton>
+          </div>
+        </form>
+      </ObsPanel>
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm">
+      <ObsPanel className="p-5">
         <div className="space-y-2 text-sm">
           {logs.map((log) => (
-            <p key={log.id} className="rounded-lg bg-slate-50 p-3">
-              <strong>{log.action}</strong> · {log.targetType}
-              {log.targetId ? `:${log.targetId}` : ""} · {log.user?.email ?? "système"} ·{" "}
-              {log.createdAt.toLocaleString("fr-FR")}
+            <p key={log.id} className="rounded-md bg-obs-elevated p-3 text-zinc-300">
+              <span className="font-semibold text-obs-signal">{log.action}</span> · {log.targetType}
+              {log.targetId ? `:${log.targetId}` : ""} · <span className="text-zinc-500">{log.user?.email ?? "system"}</span> ·{" "}
+              <span className="text-zinc-500">{log.createdAt.toLocaleString("en-GB")}</span>
             </p>
           ))}
         </div>
-        <div className="mt-6 flex items-center justify-between text-sm">
+        <div className="mt-6 flex items-center justify-between text-sm text-zinc-400">
           <span>
             Page {page} / {totalPages}
           </span>
           <div className="flex gap-2">
             {page > 1 ? (
               <Link
-                className={btnSecondary}
                 href={`/admin/audit?${new URLSearchParams({ ...(actionFilter ? { action: actionFilter } : {}), ...(targetType ? { targetType } : {}), page: String(page - 1) }).toString()}`}
               >
-                Précédent
+                <ObsButton variant="outline">Previous</ObsButton>
               </Link>
             ) : null}
             {page < totalPages ? (
               <Link
-                className={btnSecondary}
                 href={`/admin/audit?${new URLSearchParams({ ...(actionFilter ? { action: actionFilter } : {}), ...(targetType ? { targetType } : {}), page: String(page + 1) }).toString()}`}
               >
-                Suivant
+                <ObsButton variant="outline">Next</ObsButton>
               </Link>
             ) : null}
           </div>
         </div>
-      </section>
+      </ObsPanel>
     </div>
   );
 }

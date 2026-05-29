@@ -269,7 +269,7 @@ export function DeclarationWizard(props: Props) {
     >
       {body}
       {error ? (
-        <p className="mt-4 text-sm text-rose-700" role="alert">
+        <p className="mt-4 rounded-md border border-red-500/30 bg-red-950/50 p-3 text-sm text-red-300" role="alert">
           {error}
         </p>
       ) : null}

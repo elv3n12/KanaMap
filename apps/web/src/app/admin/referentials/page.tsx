@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { upsertLookupAction } from "@/app/admin/actions";
 import { db } from "@/lib/db";
-import { btnPrimary } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -21,31 +21,32 @@ export default async function AdminReferentielsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Référentiels</h1>
-        <p className="mt-2 text-slate-700">Molécules, allégations, effets et catalogues observés.</p>
+        <p className="obs-label text-obs-signal">Admin</p>
+        <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Referentials</h1>
+        <p className="mt-1 text-sm text-zinc-400">Molecules, marketing claims, effects, and observed catalogues.</p>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-3">
-        <Lookup title="Molécules" type="molecule" labels={molecules.map((item) => item.name)} />
-        <Lookup title="Allégations marketing" type="claim" labels={claims.map((item) => item.label)} />
-        <Lookup title="Effets indésirables" type="effect" labels={effects.map((item) => item.label)} />
+        <Lookup title="Molecules" type="molecule" labels={molecules.map((item) => item.name)} />
+        <Lookup title="Marketing claims" type="claim" labels={claims.map((item) => item.label)} />
+        <Lookup title="Adverse effects" type="effect" labels={effects.map((item) => item.label)} />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold">Marques observées</h2>
-          <p className="mt-3 text-sm text-slate-600">{brands.map((brand) => brand.name).join(", ") || "Aucune marque."}</p>
-        </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold">Produits observés</h2>
-          <div className="mt-3 space-y-2 text-sm">
+        <ObsPanel className="p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Observed brands</h2>
+          <p className="mt-3 text-sm leading-6 text-zinc-400">{brands.map((brand) => brand.name).join(", ") || "No brands."}</p>
+        </ObsPanel>
+        <ObsPanel className="p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Observed products</h2>
+          <div className="mt-3 space-y-2 text-sm text-zinc-400">
             {products.map((product) => (
               <p key={product.id}>
-                {product.commercialName} {product.brand ? `· ${product.brand.name}` : ""}
+                {product.commercialName} {product.brand ? <span className="text-zinc-500">· {product.brand.name}</span> : ""}
               </p>
             ))}
           </div>
-        </div>
+        </ObsPanel>
       </section>
     </div>
   );
@@ -53,16 +54,21 @@ export default async function AdminReferentielsPage() {
 
 function Lookup({ title, type, labels }: { title: string; type: string; labels: string[] }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-semibold">{title}</h2>
+    <ObsPanel className="p-5">
+      <h2 className="text-lg font-semibold text-zinc-100">{title}</h2>
       <form action={upsertLookupAction} className="mt-4 flex gap-2">
         <input type="hidden" name="type" value={type} />
-        <input required name="label" className="min-w-0 flex-1 rounded-lg border p-2" placeholder="Ajouter" />
-        <button className={btnPrimary} type="submit">
-          OK
-        </button>
+        <input
+          required
+          name="label"
+          className="min-w-0 flex-1 rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-500"
+          placeholder="Add…"
+        />
+        <ObsButton type="submit" variant="primary">
+          Add
+        </ObsButton>
       </form>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{labels.join(", ")}</p>
-    </div>
+      <p className="mt-3 text-sm leading-6 text-zinc-500">{labels.join(", ") || "None yet."}</p>
+    </ObsPanel>
   );
 }

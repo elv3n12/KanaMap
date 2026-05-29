@@ -4,7 +4,7 @@ import { auth, signOut } from "@/auth";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { deleteAccountAction } from "./actions";
-import { btnDestructive, btnNavPill, btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -25,56 +25,76 @@ export default async function AccountPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-semibold">My account</h1>
-      <p className="mt-2 text-sm text-slate-700">{session.user.email}</p>
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/reports/new" className={btnNavPill}>
-          Submit a report
-        </Link>
-        <Link href="/reports/new" className={btnSecondary}>
-          Report adverse effects
-        </Link>
-      </div>
-      <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">My reports</h2>
-        <div className="mt-4 divide-y">
-          {reports.map((report) => (
-            <div key={report.id} className="py-4">
-              <p className="font-medium">{report.productCommercialName ?? "Observed product"}</p>
-              <p className="text-sm text-slate-600">
-                {report.location.displayZone} · {REPORT_STATUS_LABELS[report.moderationStatus]}
-              </p>
-            </div>
-          ))}
-          {reports.length === 0 ? <p className="py-4 text-sm text-slate-600">No reports yet.</p> : null}
+    <div className="obs-grid-bg min-h-screen">
+      {/* Hero */}
+      <section className="border-b border-obs-border bg-gradient-to-b from-obs-elevated/80 to-obs-void px-4 py-12 md:py-16">
+        <div className="mx-auto max-w-5xl">
+          <p className="obs-label text-obs-signal">Dashboard</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100 md:text-3xl">
+            My account
+          </h1>
+          <p className="mt-2 font-mono text-sm text-zinc-400">{session.user.email}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/reports/new"
+              className="inline-flex min-h-9 items-center rounded border border-violet-600/50 bg-obs-violet px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
+            >
+              Submit a report
+            </Link>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}
+            >
+              <ObsButton type="submit" variant="outline">
+                Log out
+              </ObsButton>
+            </form>
+          </div>
         </div>
       </section>
-      <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-semibold">My adverse effect declarations</h2>
-        <p className="mt-3 text-sm text-slate-600">{declarations.length} declaration(s) submitted.</p>
-      </section>
-      <form action={deleteAccountAction} className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5">
-        <h2 className="font-semibold text-red-900">Right to be forgotten</h2>
-        <p className="mt-2 text-sm text-red-800">
-          Deletion anonymizes your contributions to preserve the public interest of
-          aggregated data.
-        </p>
-        <button className={`mt-4 ${btnDestructive}`} type="submit">
-          Delete my account
-        </button>
-      </form>
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/" });
-        }}
-        className="mt-8"
-      >
-        <button className={btnSecondary} type="submit">
-          Log out
-        </button>
-      </form>
+
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Reports */}
+          <ObsPanel className="p-5">
+            <h2 className="text-lg font-semibold text-zinc-100">My reports</h2>
+            <div className="mt-4 divide-y divide-obs-border">
+              {reports.map((report) => (
+                <div key={report.id} className="py-3">
+                  <p className="font-medium text-zinc-200">{report.productCommercialName ?? "Observed product"}</p>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    {report.location.displayZone} · <span className="text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</span>
+                  </p>
+                </div>
+              ))}
+              {reports.length === 0 ? <p className="py-4 text-sm text-zinc-500">No reports yet.</p> : null}
+            </div>
+          </ObsPanel>
+
+          {/* Declarations */}
+          <ObsPanel className="p-5">
+            <h2 className="text-lg font-semibold text-zinc-100">Adverse effect declarations</h2>
+            <p className="mt-3 text-sm text-zinc-400">
+              <span className="font-mono text-lg text-obs-signal">{declarations.length}</span> declaration(s) submitted.
+            </p>
+          </ObsPanel>
+        </div>
+
+        {/* Danger zone */}
+        <div className="mt-8 rounded-lg border border-red-500/30 bg-red-950/30 p-5">
+          <h2 className="font-semibold text-red-300">Right to be forgotten</h2>
+          <p className="mt-2 text-sm text-red-200/80">
+            Deletion anonymizes your contributions to preserve the public interest of aggregated data.
+          </p>
+          <form action={deleteAccountAction} className="mt-4">
+            <ObsButton type="submit" variant="danger">
+              Delete my account
+            </ObsButton>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
