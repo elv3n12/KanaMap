@@ -128,12 +128,12 @@ export function StepLocation({ data, onChange }: StepProps) {
           required
         />
         {showSuggestions && suggestions.length > 0 ? (
-          <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+          <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md border border-obs-border bg-obs-elevated shadow-lg">
             {suggestions.map((s) => (
               <li key={`${s.name}-${s.lat}`}>
                 <button
                   type="button"
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                  className="w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-obs-surface"
                   onClick={() => pickCity(s)}
                 >
                   {s.name}
@@ -259,7 +259,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
         </SelectInput>
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-800">Other suspected molecules (optional)</p>
+        <p className="text-sm font-medium text-zinc-200">Other suspected molecules (optional)</p>
         <MoleculeAutocomplete
           id="suspectedMolecules"
           label="Add suspected molecules"
@@ -275,7 +275,7 @@ export function StepSubstance({ data, onChange, lookups }: StepProps) {
         />
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-800">Marketing claims heard (optional)</p>
+        <p className="text-sm font-medium text-zinc-200">Marketing claims heard (optional)</p>
         <CheckboxGrid
           idPrefix="claim"
           options={lookups.claims.map((c) => ({ id: c.id, label: c.label }))}
@@ -431,7 +431,7 @@ export function StepNegativeEffects({ data, onChange, lookups }: StepProps) {
           onChange={(e) => onChange({ medicalCare: e.target.checked })}
           className="h-4 w-4"
         />
-        <span className="text-sm text-slate-800">I received medical care or went to the emergency room</span>
+        <span className="text-sm text-zinc-200">I received medical care or went to the emergency room</span>
       </label>
     </div>
   );
@@ -443,7 +443,7 @@ export function StepClaimMatch({ data, onChange }: StepProps) {
       {Object.entries(CLAIM_MATCH_LABELS).map(([value, label]) => (
         <label
           key={value}
-          className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-4 py-3 hover:bg-slate-50"
+          className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-obs-border px-4 py-3 hover:bg-obs-surface"
         >
           <input
             type="radio"
@@ -451,7 +451,7 @@ export function StepClaimMatch({ data, onChange }: StepProps) {
             checked={data.effectsMatchClaim === value}
             onChange={() => onChange({ effectsMatchClaim: value as DeclarationData["effectsMatchClaim"] })}
           />
-          <span className="text-sm text-slate-800">{label}</span>
+          <span className="text-sm text-zinc-200">{label}</span>
         </label>
       ))}
     </div>
@@ -525,21 +525,21 @@ export function StepReview({ data, lookups }: { data: DeclarationData; lookups: 
   return (
     <dl className="space-y-3 text-sm">
       <div>
-        <dt className="font-medium text-slate-500">Location</dt>
+        <dt className="font-medium text-zinc-400">Location</dt>
         <dd>
           {data.city}, {data.countryName} — {PLACE_TYPE_LABELS[data.placeType]}
         </dd>
       </div>
       <div>
-        <dt className="font-medium text-slate-500">Product</dt>
+        <dt className="font-medium text-zinc-400">Product</dt>
         <dd>{data.productCommercialName}</dd>
       </div>
       <div>
-        <dt className="font-medium text-slate-500">Substance</dt>
+        <dt className="font-medium text-zinc-400">Substance</dt>
         <dd>{moleculeLabel}</dd>
       </div>
       <div>
-        <dt className="font-medium text-slate-500">Purchase / consumption</dt>
+        <dt className="font-medium text-zinc-400">Purchase / consumption</dt>
         <dd>
           Purchased: {data.bought ? "yes" : "no"}
           {data.bought === false && reasonBought ? ` (${reasonBought})` : ""}
@@ -555,7 +555,7 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
   if (consumed) {
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border-2 border-rose-300 bg-rose-50 p-4 text-rose-950">
+        <div className="rounded-xl border-2 border-red-500/50 bg-red-950/50 p-4 text-red-100">
           <p className="font-semibold">Your safety comes first</p>
           <p className="mt-2 text-sm leading-6">
             If you are currently experiencing severe symptoms — palpitations, chest pain, difficulty breathing,
@@ -583,7 +583,7 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
             </li>
           </ul>
         </div>
-        <p className="text-sm text-slate-700">
+        <p className="text-sm text-zinc-400">
           Your report has been recorded. It will be reviewed as part of the observatory&apos;s
           moderation process.
         </p>
@@ -592,7 +592,7 @@ export function StepConfirmation({ consumed }: { consumed: boolean }) {
   }
 
   return (
-    <p className="text-sm leading-6 text-slate-700">
+    <p className="text-sm leading-6 text-zinc-400">
       Your observation has been recorded. It will enter the observatory&apos;s moderation process.
       Thank you for your contribution.
     </p>
@@ -605,7 +605,7 @@ export function ConfirmationActions() {
       <Link href="/map" className={btnPrimary}>
         Back to map
       </Link>
-      <Link href="/account" className="text-center text-sm text-blue-700 underline">
+      <Link href="/account" className="text-center text-sm text-obs-signal underline">
         My reports
       </Link>
     </div>
