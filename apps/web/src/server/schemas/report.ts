@@ -139,6 +139,7 @@ export type ReportInput = z.infer<typeof reportSchema>;
 
 export const reportUpdateSchema = z
   .object({
+    productCommercialName: z.string().trim().min(1).max(200).optional(),
     placeType: z.nativeEnum(PlaceType).optional(),
     placeOtherLabel: z.string().trim().nullable().optional(),
     productType: z.nativeEnum(ProductType).optional(),

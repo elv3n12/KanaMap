@@ -183,6 +183,7 @@ export function ZoneFilters({ molecules, filters, onChange, compact }: Props) {
         });
       }}
       placeholder="Search molecule…"
+      hidePills
     />
   );
 

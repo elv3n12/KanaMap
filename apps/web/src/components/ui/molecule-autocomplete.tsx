@@ -13,6 +13,7 @@ type Props = {
   onChange: (next: { ids: string[]; customNames: string[] }) => void;
   placeholder?: string;
   singleSelect?: boolean;
+  hidePills?: boolean;
 };
 
 function normalize(value: string) {
@@ -28,6 +29,7 @@ export function MoleculeAutocomplete({
   onChange,
   placeholder,
   singleSelect = false,
+  hidePills = false,
 }: Props) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -227,7 +229,7 @@ export function MoleculeAutocomplete({
         />
       </div>
 
-      {pills.length > 0 ? (
+      {!hidePills && pills.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-2">
           {pills.map((pill) => (
             <span

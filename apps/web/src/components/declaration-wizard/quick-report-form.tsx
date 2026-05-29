@@ -64,6 +64,7 @@ function toPayload(data: DeclarationData) {
 function toUpdatePayload(data: DeclarationData) {
   const consumed = data.consumed === true;
   return {
+    productCommercialName: data.productCommercialName.trim() || undefined,
     placeType: data.placeType,
     placeOtherLabel: data.placeOtherLabel ?? null,
     productType: data.productType,
@@ -100,6 +101,8 @@ export function QuickReportForm({
   const [advancedOpen, setAdvancedOpen] = useState(isEdit);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [done, setDone] = useState(false);
 
   const [cityQuery, setCityQuery] = useState(data.city);
@@ -225,6 +228,26 @@ export function QuickReportForm({
     }
   }
 
+  async function deleteReport() {
+    if (!reportId) return;
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/reports/${reportId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json();
+        setError(body.error ?? "Error deleting report.");
+        setDeleting(false);
+        return;
+      }
+      router.push("/account");
+      router.refresh();
+    } catch {
+      setError("Network error. Please try again.");
+      setDeleting(false);
+    }
+  }
+
   if (done) {
     return (
       <div className="obs-panel p-5 sm:p-6">
@@ -344,6 +367,16 @@ export function QuickReportForm({
       {advancedOpen ? (
         <div className="space-y-5 border-t border-obs-border pt-5">
           <p className="obs-label text-obs-signal">Advanced report</p>
+
+          <div>
+            <FieldLabel htmlFor="commercialName">Commercial name</FieldLabel>
+            <TextInput
+              id="commercialName"
+              value={data.productCommercialName}
+              onChange={(e) => patch({ productCommercialName: e.target.value })}
+              placeholder="Brand or product name (optional)"
+            />
+          </div>
 
           <div>
             <FieldLabel htmlFor="placeType">Point of sale type</FieldLabel>
@@ -471,13 +504,31 @@ export function QuickReportForm({
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        {!advancedOpen ? (
+          <button
+            type="button"
+            className="text-sm text-obs-signal underline hover:text-obs-violet"
+            onClick={() => setAdvancedOpen(true)}
+          >
+            Advanced report
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="text-sm text-zinc-400 underline hover:text-zinc-200"
+            onClick={() => setAdvancedOpen(false)}
+          >
+            Hide advanced options
+          </button>
+        )}
+
         <ObsButton
           variant="primary"
           type="button"
-          className="w-full min-h-11"
+          className="ml-auto min-h-11 px-6"
           onClick={() => void submit()}
-          disabled={submitting}
+          disabled={submitting || deleting}
         >
           {submitting
             ? isEdit
@@ -487,25 +538,40 @@ export function QuickReportForm({
               ? "Save changes"
               : "Submit report"}
         </ObsButton>
-
-        {!advancedOpen ? (
-          <button
-            type="button"
-            className="text-center text-sm text-obs-signal underline hover:text-obs-violet"
-            onClick={() => setAdvancedOpen(true)}
-          >
-            Advanced report
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="text-center text-sm text-zinc-400 underline hover:text-zinc-200"
-            onClick={() => setAdvancedOpen(false)}
-          >
-            Hide advanced options
-          </button>
-        )}
       </div>
+
+      {isEdit ? (
+        <div className="border-t border-obs-border pt-4">
+          {!confirmDelete ? (
+            <button
+              type="button"
+              className="text-sm text-red-400 underline hover:text-red-300"
+              onClick={() => setConfirmDelete(true)}
+            >
+              Delete this report
+            </button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-red-300">Are you sure?</span>
+              <button
+                type="button"
+                className="rounded border border-red-500/40 bg-red-950/50 px-3 py-1.5 text-sm font-medium text-red-300 hover:bg-red-900/50"
+                onClick={() => void deleteReport()}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
+              <button
+                type="button"
+                className="text-sm text-zinc-400 underline hover:text-zinc-200"
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

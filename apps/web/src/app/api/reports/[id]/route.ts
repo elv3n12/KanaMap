@@ -40,6 +40,28 @@ export async function GET(_request: Request, { params }: Params) {
   });
 }
 
+export async function DELETE(_request: Request, { params }: Params) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Login required" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const existing = await db.report.findUnique({ where: { id } });
+
+  if (!existing) {
+    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+  }
+
+  if (existing.createdById !== session.user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await db.report.delete({ where: { id } });
+
+  return NextResponse.json({ ok: true });
+}
+
 export async function PATCH(request: Request, { params }: Params) {
   const session = await auth();
   if (!session?.user) {
@@ -83,6 +105,7 @@ export async function PATCH(request: Request, { params }: Params) {
       await tx.report.update({
         where: { id },
         data: {
+          productCommercialName: parsed.productCommercialName ?? existing.productCommercialName,
           placeType: parsed.placeType ?? existing.placeType,
           placeOtherLabel: parsed.placeOtherLabel ?? null,
           productType: parsed.productType ?? existing.productType,
