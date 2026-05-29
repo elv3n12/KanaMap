@@ -11,6 +11,8 @@ env:
   HOSTINGER_API_BASE: https://developers.hostinger.com
   HOSTINGER_VM_ID: "1339684"
   HOSTINGER_PROJECT: kanamap
+  VPS_HOST: 217.65.144.105
+  VPS_USER: root
 
 jobs:
   build-and-push:
@@ -18,6 +20,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +45,10 @@ jobs:
             type=sha
             type=raw,value=latest
 
+      - name: Set image tag output
+        id: vars
+        run: echo "image_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -58,6 +66,51 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-deploy prune + set image tag (via SSH)
+        if: ${{ secrets.VPS_SSH_PRIVATE_KEY != '' }}
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            echo "=== Pre-deploy: prune old KanaMap images ==="
+            IMAGE_REPO="ghcr.io/elv3n12/kanamap"
+
+            # Get image IDs used by kanamap containers
+            USED_IDS=$(docker ps -a --filter "name=kanamap" --format '{{.Image}}' | \
+              xargs -r -I{} docker inspect --format '{{.Id}}' {} 2>/dev/null | sort -u || true)
+
+            # Remove unused kanamap images
+            for IMG_ID in $(docker images "$IMAGE_REPO" --format '{{.ID}}' | sort -u); do
+              if echo "$USED_IDS" | grep -q "$IMG_ID"; then
+                echo "Keeping $IMG_ID (in use)"
+              else
+                echo "Removing $IMG_ID"
+                docker rmi -f "$IMG_ID" 2>/dev/null || true
+              fi
+            done
+
+            # Update image tag in kanamap .env
+            echo "=== Setting KANAMAP_IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }} ==="
+            ENV_FILE="/docker/kanamap/.env"
+            if [ -f "$ENV_FILE" ]; then
+              sed -i '/^KANAMAP_IMAGE_TAG=/d' "$ENV_FILE"
+            fi
+            echo "KANAMAP_IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}" >> "$ENV_FILE"
+
+            echo "=== Pre-deploy complete ==="
+
+      - name: Warn if SSH not configured
+        if: ${{ secrets.VPS_SSH_PRIVATE_KEY == '' }}
+        run: |
+          echo "::warning::VPS_SSH_PRIVATE_KEY not set. Skipping pre-deploy prune."
+          echo "Old images will accumulate on the VPS. See docs/DEPLOY_PRODUCTION.md"
+
       - name: Trigger Hostinger deploy
         env:
           TOKEN_FROM_SECRET: ${{ secrets.HOSTINGER_API_TOKEN }}
@@ -111,3 +164,16 @@ jobs:
           done
           echo "::error::kanamap-web-1 did not reach running state"
           exit 1
+
+      - name: Post-deploy prune dangling images (via SSH)
+        if: ${{ secrets.VPS_SSH_PRIVATE_KEY != '' }}
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== Post-deploy: prune dangling images ==="
+            docker image prune -f
+            echo "=== Disk usage ==="
+            docker system df

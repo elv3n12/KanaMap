@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/elv3n12/kanamap:latest
+    image: ghcr.io/elv3n12/kanamap:${KANAMAP_IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -29,6 +29,11 @@ services:
       - UPLOAD_DIR=/app/uploads
     volumes:
       - web_uploads:/app/uploads
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       - traefik.enable=true
       - traefik.http.routers.kanamap.rule=Host(`kanamap.srv1339684.hstgr.cloud`)
@@ -53,6 +58,11 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
