@@ -57,20 +57,23 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # Repository secrets always apply. Environment secrets named production also work.
-    environment: production
     steps:
       - name: Trigger Hostinger deploy
         env:
-          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          TOKEN_FROM_SECRET: ${{ secrets.HOSTINGER_API_TOKEN }}
+          TOKEN_FROM_VAR: ${{ vars.HOSTINGER_API_TOKEN }}
         run: |
           set -euo pipefail
+          HOSTINGER_API_TOKEN="${TOKEN_FROM_SECRET:-${TOKEN_FROM_VAR:-}}"
           if [ -z "${HOSTINGER_API_TOKEN}" ]; then
             echo "::error::HOSTINGER_API_TOKEN is empty."
-            echo "Add it under Settings → Secrets and variables → Actions → Repository secrets"
-            echo "(exact name: HOSTINGER_API_TOKEN). See docs/DEPLOY_PRODUCTION.md"
+            echo "Add it as a Repository *secret* (not a variable):"
+            echo "  Settings → Secrets and variables → Actions → Repository secrets → New"
+            echo "  Name: HOSTINGER_API_TOKEN"
+            echo "See docs/DEPLOY_PRODUCTION.md"
             exit 1
           fi
+          export HOSTINGER_API_TOKEN
           UPDATE_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/update"
           echo "Triggering deploy: $UPDATE_URL"
           HTTP_CODE=$(curl -sS -o /tmp/hostinger-update.json -w "%{http_code}" -X POST "$UPDATE_URL" \
@@ -88,9 +91,11 @@ jobs:
 
       - name: Verify web container is running
         env:
-          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          TOKEN_FROM_SECRET: ${{ secrets.HOSTINGER_API_TOKEN }}
+          TOKEN_FROM_VAR: ${{ vars.HOSTINGER_API_TOKEN }}
         run: |
           set -euo pipefail
+          HOSTINGER_API_TOKEN="${TOKEN_FROM_SECRET:-${TOKEN_FROM_VAR:-}}"
           CONTAINERS_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/containers"
           for attempt in 1 2 3; do
             BODY=$(curl -fsS "$CONTAINERS_URL" \
