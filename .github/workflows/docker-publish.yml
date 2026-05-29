@@ -68,8 +68,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check if SSH is configured
+        id: ssh-check
+        run: |
+          if [ -n "$SSH_KEY" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::VPS_SSH_PRIVATE_KEY not set. Skipping prune steps."
+          fi
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+
       - name: Pre-deploy prune + set image tag (via SSH)
-        if: ${{ secrets.VPS_SSH_PRIVATE_KEY != '' }}
+        if: steps.ssh-check.outputs.available == 'true'
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.VPS_HOST }}
@@ -104,12 +116,6 @@ jobs:
             echo "KANAMAP_IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}" >> "$ENV_FILE"
 
             echo "=== Pre-deploy complete ==="
-
-      - name: Warn if SSH not configured
-        if: ${{ secrets.VPS_SSH_PRIVATE_KEY == '' }}
-        run: |
-          echo "::warning::VPS_SSH_PRIVATE_KEY not set. Skipping pre-deploy prune."
-          echo "Old images will accumulate on the VPS. See docs/DEPLOY_PRODUCTION.md"
 
       - name: Trigger Hostinger deploy
         env:
@@ -166,7 +172,7 @@ jobs:
           exit 1
 
       - name: Post-deploy prune dangling images (via SSH)
-        if: ${{ secrets.VPS_SSH_PRIVATE_KEY != '' }}
+        if: steps.ssh-check.outputs.available == 'true'
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.VPS_HOST }}
