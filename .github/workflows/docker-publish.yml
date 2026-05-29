@@ -57,26 +57,30 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    # Repository secrets always apply. Environment secrets named production also work.
+    environment: production
     steps:
-      - name: Require Hostinger API token
-        env:
-          TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then
-            echo "::error::HOSTINGER_API_TOKEN is not set. See docs/DEPLOY_PRODUCTION.md"
-            exit 1
-          fi
-
       - name: Trigger Hostinger deploy
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -z "${HOSTINGER_API_TOKEN}" ]; then
+            echo "::error::HOSTINGER_API_TOKEN is empty."
+            echo "Add it under Settings → Secrets and variables → Actions → Repository secrets"
+            echo "(exact name: HOSTINGER_API_TOKEN). See docs/DEPLOY_PRODUCTION.md"
+            exit 1
+          fi
           UPDATE_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/update"
           echo "Triggering deploy: $UPDATE_URL"
-          curl -fsS -X POST "$UPDATE_URL" \
+          HTTP_CODE=$(curl -sS -o /tmp/hostinger-update.json -w "%{http_code}" -X POST "$UPDATE_URL" \
             -H "Authorization: Bearer ${HOSTINGER_API_TOKEN}" \
-            -H "Content-Type: application/json"
+            -H "Accept: application/json")
+          cat /tmp/hostinger-update.json || true
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "::error::Hostinger update failed (HTTP $HTTP_CODE). Check API token permissions."
+            exit 1
+          fi
           echo "Deploy triggered for commit ${GITHUB_SHA}"
 
       - name: Wait for containers
@@ -88,8 +92,17 @@ jobs:
         run: |
           set -euo pipefail
           CONTAINERS_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/containers"
-          BODY=$(curl -fsS "$CONTAINERS_URL" \
-            -H "Authorization: Bearer ${HOSTINGER_API_TOKEN}")
-          echo "$BODY" | jq -e '.[] | select(.name == "kanamap-web-1") | .status | test("Up")' > /dev/null
-          echo "kanamap-web-1 is up"
-          echo "$BODY" | jq '.[] | {name, status, image}'
+          for attempt in 1 2 3; do
+            BODY=$(curl -fsS "$CONTAINERS_URL" \
+              -H "Authorization: Bearer ${HOSTINGER_API_TOKEN}" \
+              -H "Accept: application/json")
+            echo "$BODY" | jq '.[] | {name, status, state, image}'
+            if echo "$BODY" | jq -e '.[] | select(.name == "kanamap-web-1") | .state == "running"' > /dev/null; then
+              echo "kanamap-web-1 is running"
+              exit 0
+            fi
+            echo "Web container not ready yet (attempt $attempt/3), waiting 30s..."
+            sleep 30
+          done
+          echo "::error::kanamap-web-1 did not reach running state"
+          exit 1

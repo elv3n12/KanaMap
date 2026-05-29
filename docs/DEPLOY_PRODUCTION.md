@@ -5,11 +5,14 @@ Production runs on Hostinger VPS **1339684**, Docker Compose project **`kanamap`
 ## One-time setup: Hostinger API token
 
 1. Open [Hostinger API](https://developers.hostinger.com/) → create an API token (VPS / Docker permissions).
-2. In GitHub: **elv3n12/KanaMap** → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
-3. Name: `HOSTINGER_API_TOKEN`  
+2. In GitHub: **elv3n12/KanaMap** → **Settings** → **Secrets and variables** → **Actions**
+3. Under **Repository secrets** (not Dependabot or Codespaces), click **New repository secret**
+4. Name: `HOSTINGER_API_TOKEN` (exact spelling, case-sensitive)  
    Value: paste the token from step 1.
 
-Without this secret, the **deploy** job in [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) fails with a clear error.
+**Alternative:** add the same name under **Environments** → **production** → **Environment secrets**. The deploy job uses `environment: production`.
+
+If the deploy job fails with “HOSTINGER_API_TOKEN is empty”, the secret is in the wrong place or has the wrong name. Re-add it as a **repository** secret, then re-run the workflow.
 
 ## What happens on `git push` to `main`
 
