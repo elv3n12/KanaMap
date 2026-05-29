@@ -69,35 +69,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check if SSH is configured
+      - name: Check if SSH prune is configured
         id: ssh-check
-        run: |
-          if [ -n "$SSH_KEY" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::VPS_SSH_PRIVATE_KEY not set. Skipping prune steps."
-          fi
         env:
           SSH_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SSH_KEY" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::VPS_SSH_PRIVATE_KEY not set. Deploy continues, prune skipped."
+            exit 0
+          fi
+
+          if ! printf '%s' "$SSH_KEY" | grep -Eq "BEGIN (OPENSSH|RSA|EC|PRIVATE)"; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::VPS_SSH_PRIVATE_KEY does not look like a private key."
+            echo "::warning::If you pasted a Hostinger managed public key, use the matching private key instead."
+            exit 0
+          fi
+
+          echo "available=true" >> "$GITHUB_OUTPUT"
 
       - name: Pre-deploy prune + set image tag (via SSH)
+        id: pre-prune
         if: steps.ssh-check.outputs.available == 'true'
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ env.VPS_HOST }}
-          username: ${{ env.VPS_USER }}
+          host: ${{ vars.VPS_SSH_HOST != '' && vars.VPS_SSH_HOST || env.VPS_HOST }}
+          username: ${{ vars.VPS_SSH_USER != '' && vars.VPS_SSH_USER || env.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          command_timeout: 20m
           script: |
             set -euo pipefail
             echo "=== Pre-deploy: prune old KanaMap images ==="
             IMAGE_REPO="ghcr.io/elv3n12/kanamap"
 
-            # Get image IDs used by kanamap containers
             USED_IDS=$(docker ps -a --filter "name=kanamap" --format '{{.Image}}' | \
               xargs -r -I{} docker inspect --format '{{.Id}}' {} 2>/dev/null | sort -u || true)
 
-            # Remove unused kanamap images
             for IMG_ID in $(docker images "$IMAGE_REPO" --format '{{.ID}}' | sort -u); do
               if echo "$USED_IDS" | grep -q "$IMG_ID"; then
                 echo "Keeping $IMG_ID (in use)"
@@ -107,7 +117,6 @@ jobs:
               fi
             done
 
-            # Update image tag in kanamap .env
             echo "=== Setting KANAMAP_IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }} ==="
             ENV_FILE="/docker/kanamap/.env"
             if [ -f "$ENV_FILE" ]; then
@@ -116,6 +125,13 @@ jobs:
             echo "KANAMAP_IMAGE_TAG=${{ needs.build-and-push.outputs.image_tag }}" >> "$ENV_FILE"
 
             echo "=== Pre-deploy complete ==="
+
+      - name: Warn if SSH prune failed
+        if: steps.ssh-check.outputs.available == 'true' && steps.pre-prune.outcome == 'failure'
+        run: |
+          echo "::warning::SSH prune step failed."
+          echo "::warning::Deploy will continue, but old images may remain on VPS."
+          echo "::warning::Check VPS_SSH_PRIVATE_KEY / VPS_SSH_PASSPHRASE / VPS_SSH_HOST / VPS_SSH_USER."
 
       - name: Trigger Hostinger deploy
         env:
@@ -126,13 +142,10 @@ jobs:
           HOSTINGER_API_TOKEN="${TOKEN_FROM_SECRET:-${TOKEN_FROM_VAR:-}}"
           if [ -z "${HOSTINGER_API_TOKEN}" ]; then
             echo "::error::HOSTINGER_API_TOKEN is empty."
-            echo "Add it as a Repository *secret* (not a variable):"
-            echo "  Settings → Secrets and variables → Actions → Repository secrets → New"
-            echo "  Name: HOSTINGER_API_TOKEN"
-            echo "See docs/DEPLOY_PRODUCTION.md"
+            echo "Add it as a Repository secret named HOSTINGER_API_TOKEN."
             exit 1
           fi
-          export HOSTINGER_API_TOKEN
+
           UPDATE_URL="${HOSTINGER_API_BASE}/api/vps/v1/virtual-machines/${HOSTINGER_VM_ID}/docker/${HOSTINGER_PROJECT}/update"
           echo "Triggering deploy: $UPDATE_URL"
           HTTP_CODE=$(curl -sS -o /tmp/hostinger-update.json -w "%{http_code}" -X POST "$UPDATE_URL" \
@@ -140,10 +153,9 @@ jobs:
             -H "Accept: application/json")
           cat /tmp/hostinger-update.json || true
           if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
-            echo "::error::Hostinger update failed (HTTP $HTTP_CODE). Check API token permissions."
+            echo "::error::Hostinger update failed (HTTP $HTTP_CODE)."
             exit 1
           fi
-          echo "Deploy triggered for commit ${GITHUB_SHA}"
 
       - name: Wait for containers
         run: sleep 90
@@ -172,14 +184,24 @@ jobs:
           exit 1
 
       - name: Post-deploy prune dangling images (via SSH)
+        id: post-prune
         if: steps.ssh-check.outputs.available == 'true'
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ env.VPS_HOST }}
-          username: ${{ env.VPS_USER }}
+          host: ${{ vars.VPS_SSH_HOST != '' && vars.VPS_SSH_HOST || env.VPS_HOST }}
+          username: ${{ vars.VPS_SSH_USER != '' && vars.VPS_SSH_USER || env.VPS_USER }}
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          command_timeout: 20m
           script: |
             echo "=== Post-deploy: prune dangling images ==="
             docker image prune -f
             echo "=== Disk usage ==="
             docker system df
+
+      - name: Warn if post-deploy prune failed
+        if: steps.ssh-check.outputs.available == 'true' && steps.post-prune.outcome == 'failure'
+        run: |
+          echo "::warning::Post-deploy SSH prune failed."
+          echo "::warning::Deployment is complete, but dangling images may remain."
