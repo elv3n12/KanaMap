@@ -57,24 +57,14 @@ export function ObservatoryMapShell({ molecules }: Props) {
   const clearFilters = () => setFilters({});
 
   return (
-    <div className="relative h-full min-h-[500px] w-full overflow-hidden bg-obs-void">
-      <ObservatoryMap
-        zones={zones}
-        onSelect={setSelectedZone}
-        selectedZoneId={selectedZone?.locationId ?? null}
-      />
-
-      {/* Compact filter toolbar */}
-      <div
-        className={`absolute left-2 top-[6.5rem] z-[900] flex max-w-[calc(100%-1rem)] flex-col gap-2 transition-[right] sm:left-3 sm:top-[7.5rem] sm:max-w-[calc(100%-1.5rem)] ${
-          selectedZone ? "right-2 sm:right-[min(92vw,400px)]" : "right-2 sm:right-3"
-        }`}
-      >
-        <div className="obs-panel hidden flex-wrap items-end gap-3 p-3 md:flex">
+    <div className="flex h-full min-h-[500px] w-full flex-col overflow-hidden bg-obs-void">
+      {/* Top filter bar */}
+      <div className="z-[900] flex shrink-0 flex-wrap items-center gap-2 border-b border-obs-border px-3 py-2">
+        <div className="hidden flex-wrap items-center gap-2 md:flex">
           <ZoneFilters molecules={molecules} filters={filters} onChange={setFilters} compact />
         </div>
 
-        <div className="obs-panel flex items-center gap-2 p-2 md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
           <ObsButton variant="outline" onClick={() => setMobileFiltersOpen((o) => !o)}>
             {mobileFiltersOpen ? "Close" : "Filter"}
           </ObsButton>
@@ -85,39 +75,53 @@ export function ObservatoryMapShell({ molecules }: Props) {
           ) : null}
         </div>
 
-        {mobileFiltersOpen ? (
-          <div className="obs-panel p-3 md:hidden">
-            <ZoneFilters molecules={molecules} filters={filters} onChange={setFilters} />
-          </div>
-        ) : null}
-
-        <FilterChips
-          filters={filters}
-          molecules={molecules}
-          onChange={setFilters}
-          onClear={clearFilters}
-        />
+        <div className="ml-auto flex items-center gap-3">
+          <span className="obs-data-value text-sm">
+            <span className="obs-label mr-1">Zones</span>
+            {zones.length}
+          </span>
+          {hasActiveFilters(filters) ? (
+            <span className="obs-label text-obs-signal">Filtered</span>
+          ) : null}
+        </div>
       </div>
 
-      {/* Zone intel panel */}
-      {selectedZone ? (
-        <div className="absolute bottom-14 left-2 right-2 z-[900] sm:bottom-auto sm:left-auto sm:right-3 sm:top-[7.5rem] sm:w-[min(92vw,380px)]">
-          <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
+      {/* Mobile filter drawer */}
+      {mobileFiltersOpen ? (
+        <div className="z-[900] border-b border-obs-border px-3 py-2 md:hidden">
+          <ZoneFilters molecules={molecules} filters={filters} onChange={setFilters} />
         </div>
       ) : null}
 
-      {/* Bottom status bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-[900] border-t border-obs-border bg-obs-void/90 px-4 py-2 backdrop-blur-md">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="obs-data-value text-sm">
-              <span className="obs-label mr-2">Zones</span>
-              {zones.length}
-            </span>
-            {hasActiveFilters(filters) ? (
-              <span className="obs-label text-obs-signal">Filters active</span>
-            ) : null}
+      {/* Filter chips */}
+      {hasActiveFilters(filters) ? (
+        <div className="z-[900] border-b border-obs-border px-3 py-1.5">
+          <FilterChips
+            filters={filters}
+            molecules={molecules}
+            onChange={setFilters}
+            onClear={clearFilters}
+          />
+        </div>
+      ) : null}
+
+      {/* Map container */}
+      <div className="relative flex-1">
+        <ObservatoryMap
+          zones={zones}
+          onSelect={setSelectedZone}
+          selectedZoneId={selectedZone?.locationId ?? null}
+        />
+
+        {/* Zone intel panel */}
+        {selectedZone ? (
+          <div className="absolute bottom-4 left-2 right-2 z-[900] sm:bottom-auto sm:left-auto sm:right-3 sm:top-3 sm:w-[min(92vw,380px)]">
+            <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
           </div>
+        ) : null}
+
+        {/* Bottom legend */}
+        <div className="absolute bottom-2 left-2 z-[900]">
           <ObsLegend />
         </div>
       </div>
