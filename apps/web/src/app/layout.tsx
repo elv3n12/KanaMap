@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { AgeGate } from "@/components/age-gate";
-import { RiskBanner } from "@/components/risk-banner";
 import { SiteHeader } from "@/components/site-header";
 import { branding } from "@/lib/branding";
 import "./globals.css";
@@ -38,7 +37,6 @@ export default function RootLayout({
           Skip to main content
         </a>
         <SiteHeader />
-        <RiskBanner />
         <main id="main-content" className="min-h-screen pt-14" tabIndex={-1}>
           {children}
         </main>
