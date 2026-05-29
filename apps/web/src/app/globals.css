@@ -63,14 +63,20 @@
   input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea {
-    @apply border-obs-border bg-obs-elevated text-zinc-100;
+    @apply rounded-md border border-obs-border bg-obs-surface text-zinc-100 placeholder:text-zinc-500;
   }
 
   input:not([type="checkbox"]):not([type="radio"]):focus-visible,
   select:focus-visible,
   textarea:focus-visible {
     outline: none;
+    border-color: var(--obs-violet);
     box-shadow: 0 0 0 2px var(--obs-void), 0 0 0 4px var(--obs-violet);
+  }
+
+  input:not([type="checkbox"]):not([type="radio"])::placeholder,
+  textarea::placeholder {
+    color: var(--obs-muted);
   }
 }
 

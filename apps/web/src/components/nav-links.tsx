@@ -29,9 +29,9 @@ export function NavLinks({ items, isAdmin }: Props) {
           <Link
             key={item.href}
             href={item.href}
-            className={`relative inline-flex min-h-9 items-center px-2.5 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 ${
+            className={`relative inline-flex min-h-8 items-center px-1.5 py-1 font-mono text-[10px] font-medium uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 sm:min-h-9 sm:px-2.5 sm:text-xs ${
               isActive
-                ? "text-obs-signal after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:bg-obs-violet"
+                ? "text-obs-signal after:absolute after:bottom-0 after:left-1 after:right-1 after:h-0.5 after:bg-obs-violet sm:after:left-2 sm:after:right-2"
                 : "text-zinc-400 hover:text-zinc-100"
             }`}
           >

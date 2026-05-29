@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 export function FieldLabel({ htmlFor, children }: { htmlFor?: string; children: ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-800">
+    <label htmlFor={htmlFor} className="block text-sm font-medium text-zinc-200">
       {children}
     </label>
   );
@@ -12,14 +12,14 @@ export function FieldLabel({ htmlFor, children }: { htmlFor?: string; children: 
 
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <p className="mt-1 text-sm text-rose-700" role="alert">{message}</p>;
+  return <p className="mt-1 text-sm text-red-400" role="alert">{message}</p>;
 }
 
 export function SelectInput(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`mt-1 min-h-11 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 ${props.className ?? ""}`}
+      className={`mt-1 min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
     />
   );
 }
@@ -28,7 +28,7 @@ export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`mt-1 min-h-11 w-full rounded-lg border border-slate-300 p-3 text-slate-900 ${props.className ?? ""}`}
+      className={`mt-1 min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
     />
   );
 }
@@ -37,7 +37,7 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return (
     <textarea
       {...props}
-      className={`mt-1 w-full rounded-lg border border-slate-300 p-3 text-slate-900 ${props.className ?? ""}`}
+      className={`mt-1 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
     />
   );
 }
@@ -58,10 +58,10 @@ export function YesNoChoice({
       <button
         type="button"
         onClick={() => onChange(true)}
-        className={`min-h-11 flex-1 rounded-xl border-2 px-4 py-3 text-sm font-medium transition ${
+        className={`min-h-11 flex-1 rounded-lg border-2 px-4 py-3 text-sm font-medium transition ${
           value === true
-            ? "border-emerald-600 bg-emerald-50 text-emerald-900"
-            : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+            ? "border-obs-violet bg-obs-violet/20 text-obs-signal"
+            : "border-obs-border bg-obs-surface text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
         }`}
       >
         {yesLabel}
@@ -69,10 +69,10 @@ export function YesNoChoice({
       <button
         type="button"
         onClick={() => onChange(false)}
-        className={`min-h-11 flex-1 rounded-xl border-2 px-4 py-3 text-sm font-medium transition ${
+        className={`min-h-11 flex-1 rounded-lg border-2 px-4 py-3 text-sm font-medium transition ${
           value === false
-            ? "border-slate-800 bg-slate-100 text-slate-900"
-            : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+            ? "border-zinc-500 bg-zinc-700/50 text-zinc-100"
+            : "border-obs-border bg-obs-surface text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
         }`}
       >
         {noLabel}
@@ -94,21 +94,28 @@ export function CheckboxGrid({
 }) {
   return (
     <div className="mt-3 grid gap-2 sm:grid-cols-2">
-      {options.map((option) => (
-        <label
-          key={option.id}
-          className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50"
-        >
-          <input
-            id={`${idPrefix}-${option.id}`}
-            type="checkbox"
-            checked={selected.includes(option.id)}
-            onChange={() => onToggle(option.id)}
-            className="h-4 w-4 rounded border-slate-300"
-          />
-          <span className="text-sm text-slate-800">{option.label}</span>
-        </label>
-      ))}
+      {options.map((option) => {
+        const isSelected = selected.includes(option.id);
+        return (
+          <label
+            key={option.id}
+            className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition ${
+              isSelected
+                ? "border-obs-violet/60 bg-obs-violet/10"
+                : "border-obs-border bg-obs-surface hover:border-zinc-600"
+            }`}
+          >
+            <input
+              id={`${idPrefix}-${option.id}`}
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => onToggle(option.id)}
+              className="h-4 w-4 rounded border-obs-border bg-obs-elevated text-obs-violet focus:ring-obs-violet/40 focus:ring-offset-obs-void"
+            />
+            <span className={`text-sm ${isSelected ? "text-zinc-100" : "text-zinc-300"}`}>{option.label}</span>
+          </label>
+        );
+      })}
     </div>
   );
 }

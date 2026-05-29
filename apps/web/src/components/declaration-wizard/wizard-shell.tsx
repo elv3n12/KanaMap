@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { btnPrimary, btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton } from "@/components/ui/obs";
 
 type Props = {
   title: string;
@@ -31,45 +31,45 @@ export function WizardShell({
   const progress = totalSteps > 0 ? Math.round(((stepIndex + 1) / totalSteps) * 100) : 0;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
       {totalSteps > 0 ? (
         <div className="mb-6">
-          <div className="flex items-center justify-between text-xs font-medium text-slate-600">
-            <span>
-              Step {stepIndex + 1} of {totalSteps}
+          <div className="flex items-center justify-between font-mono text-xs text-zinc-400">
+            <span className="uppercase tracking-wider">
+              Step {stepIndex + 1} / {totalSteps}
             </span>
-            <span>{progress}%</span>
+            <span className="text-obs-signal">{progress}%</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-obs-elevated">
             <div
-              className="h-full rounded-full bg-emerald-600 transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-obs-violet to-obs-signal transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
       ) : null}
 
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <h1 className="text-2xl font-semibold text-slate-900" tabIndex={-1}>
+      <div className="obs-panel p-5 sm:p-6">
+        <h1 className="text-xl font-semibold text-zinc-100 sm:text-2xl" tabIndex={-1}>
           {title}
         </h1>
-        {subtitle ? <p className="mt-2 text-sm leading-6 text-slate-700">{subtitle}</p> : null}
+        {subtitle ? <p className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</p> : null}
         <div className="mt-6" aria-live="polite">
           {children}
         </div>
         {!hideNav ? (
           <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
             {onBack ? (
-              <button type="button" className={btnSecondary} onClick={onBack}>
+              <ObsButton variant="outline" onClick={onBack}>
                 Previous
-              </button>
+              </ObsButton>
             ) : (
               <span />
             )}
             {onNext ? (
-              <button type="button" className={btnPrimary} onClick={onNext} disabled={nextDisabled}>
+              <ObsButton variant="primary" onClick={onNext} disabled={nextDisabled}>
                 {nextLabel}
-              </button>
+              </ObsButton>
             ) : null}
           </div>
         ) : null}

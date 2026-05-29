@@ -9,7 +9,7 @@ import {
   PRODUCT_TYPE_LABELS,
   PROOF_LEVEL_LABELS,
 } from "@/lib/constants";
-import { btnPrimary } from "@/lib/ui/button-classes";
+import { ObsButton } from "@/components/ui/obs";
 
 const EUROPEAN_COUNTRIES = [
   { code: "FR", name: "France" },
@@ -136,20 +136,20 @@ export function ReportForm({ molecules, claims, effects }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8 rounded-2xl bg-white p-6 shadow-sm">
+    <form onSubmit={onSubmit} className="obs-panel space-y-8 p-5 sm:p-6">
       {error && (
-        <p className="rounded-lg bg-red-100 p-3 text-sm text-red-800">{error}</p>
+        <p className="rounded-md border border-red-500/30 bg-red-900/20 p-3 text-sm text-red-400">{error}</p>
       )}
 
       {/* Step 1: Zone d'observation */}
       <section>
-        <h2 className="text-xl font-semibold">1. Zone d&apos;observation</h2>
-        <p className="mt-1 text-sm text-slate-700">
+        <h2 className="text-lg font-semibold text-zinc-100">1. Zone d&apos;observation</h2>
+        <p className="mt-1 text-sm text-zinc-400">
           Sélectionnez le pays et la ville où l&apos;observation a été faite.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="country-select" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="country-select" className="mb-1 block text-sm font-medium text-zinc-200">
               Pays
             </label>
             <select
@@ -160,7 +160,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
                 setSelectedCity(null);
                 setCityQuery("");
               }}
-              className="w-full rounded-lg border p-3"
+              className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100"
             >
               {EUROPEAN_COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -171,7 +171,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
           </div>
 
           <div ref={containerRef} className="relative">
-            <label htmlFor="city-input" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="city-input" className="mb-1 block text-sm font-medium text-zinc-200">
               Ville
             </label>
             <input
@@ -187,21 +187,21 @@ export function ReportForm({ molecules, claims, effects }: Props) {
               onFocus={() => {
                 if (citySuggestions.length > 0 && !selectedCity) setShowSuggestions(true);
               }}
-              className="w-full rounded-lg border p-3"
+              className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500"
               placeholder="Commencez à taper le nom de la ville..."
             />
             {showSuggestions && citySuggestions.length > 0 && (
-              <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border bg-white shadow-lg">
+              <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-obs-border bg-obs-elevated shadow-lg">
                 {citySuggestions.map((city, i) => (
                   <li key={i}>
                     <button
                       type="button"
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100"
+                      className="w-full px-4 py-2 text-left text-sm text-zinc-200 hover:bg-obs-surface"
                       onClick={() => selectCity(city)}
                     >
                       <span className="font-medium">{city.name}</span>
                       {city.state && (
-                        <span className="ml-1 text-slate-500">({city.state})</span>
+                        <span className="ml-1 text-zinc-500">({city.state})</span>
                       )}
                     </button>
                   </li>
@@ -221,26 +221,26 @@ export function ReportForm({ molecules, claims, effects }: Props) {
 
       {/* Step 2: Produit observé */}
       <section>
-        <h2 className="text-xl font-semibold">2. Produit observé</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">2. Produit observé</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <select required name="placeType" className="rounded-lg border p-3">
+          <select required name="placeType" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
             {Object.entries(PLACE_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
-          <input name="placeOtherLabel" className="rounded-lg border p-3" placeholder="Si autre, préciser" />
-          <input name="brandRawName" className="rounded-lg border p-3" placeholder="Marque observée" />
-          <input required name="productCommercialName" className="rounded-lg border p-3" placeholder="Nom commercial du produit" />
-          <select required name="productType" className="rounded-lg border p-3">
+          <input name="placeOtherLabel" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Si autre, préciser" />
+          <input name="brandRawName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Marque observée" />
+          <input required name="productCommercialName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Nom commercial du produit" />
+          <select required name="productType" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
             {Object.entries(PRODUCT_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
-          <select name="formOfUse" className="rounded-lg border p-3">
+          <select name="formOfUse" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
             <option value="">Forme d&apos;administration (facultatif)</option>
             {Object.entries(FORM_OF_USE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -253,7 +253,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
 
       {/* Step 3: Molécules, allégations et effets */}
       <section>
-        <h2 className="text-xl font-semibold">3. Molécules, allégations et effets</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">3. Molécules, allégations et effets</h2>
         <div className="mt-4 grid gap-6 md:grid-cols-3">
           <CheckboxGroup title="Molécules annoncées" name="announcedMoleculeIds" items={molecules.map((item) => [item.id, item.name])} />
           <CheckboxGroup title="Molécules suspectées" name="suspectedMoleculeIds" items={molecules.map((item) => [item.id, item.name])} />
@@ -266,28 +266,28 @@ export function ReportForm({ molecules, claims, effects }: Props) {
 
       {/* Step 4: Niveau de preuve */}
       <section>
-        <h2 className="text-xl font-semibold">4. Niveau de preuve</h2>
+        <h2 className="text-lg font-semibold text-zinc-100">4. Niveau de preuve</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <select name="proofLevel" className="rounded-lg border p-3">
+          <select name="proofLevel" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
             {Object.entries(PROOF_LEVEL_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
-          <input required name="observationDate" type="date" defaultValue={today} className="rounded-lg border p-3" />
+          <input required name="observationDate" type="date" defaultValue={today} className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100" />
         </div>
         <textarea
           name="narrative"
-          className="mt-4 w-full rounded-lg border p-3"
+          className="mt-4 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500"
           rows={5}
           placeholder="Décrire prudemment ce qui a été observé, sans données personnelles ni information facilitant l'accès au produit."
         />
       </section>
 
-      <button className={`${btnPrimary} w-full`} type="submit">
+      <ObsButton variant="primary" className="w-full" type="submit">
         Soumettre le signalement
-      </button>
+      </ObsButton>
     </form>
   );
 }
@@ -295,11 +295,11 @@ export function ReportForm({ molecules, claims, effects }: Props) {
 function CheckboxGroup({ title, name, items, columns = false }: { title: string; name: string; items: [string, string][]; columns?: boolean }) {
   return (
     <fieldset>
-      <legend className="text-sm font-medium">{title}</legend>
+      <legend className="text-sm font-medium text-zinc-200">{title}</legend>
       <div className={`mt-2 grid gap-2 ${columns ? "md:grid-cols-3" : ""}`}>
         {items.map(([value, label]) => (
-          <label key={value} className="flex items-center gap-2 rounded-lg border p-2 text-sm">
-            <input type="checkbox" name={name} value={value} />
+          <label key={value} className="flex items-center gap-2 rounded-md border border-obs-border bg-obs-surface p-2 text-sm text-zinc-300 hover:border-zinc-600">
+            <input type="checkbox" name={name} value={value} className="h-4 w-4 rounded border-obs-border bg-obs-elevated text-obs-violet focus:ring-obs-violet/40" />
             {label}
           </label>
         ))}

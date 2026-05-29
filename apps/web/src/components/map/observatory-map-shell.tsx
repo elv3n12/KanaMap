@@ -66,8 +66,8 @@ export function ObservatoryMapShell({ molecules }: Props) {
 
       {/* Compact filter toolbar */}
       <div
-        className={`absolute left-3 top-[7.5rem] z-[900] flex max-w-[calc(100%-1.5rem)] flex-col gap-2 transition-[right] ${
-          selectedZone ? "right-[min(92vw,400px)]" : "right-3"
+        className={`absolute left-2 top-[6.5rem] z-[900] flex max-w-[calc(100%-1rem)] flex-col gap-2 transition-[right] sm:left-3 sm:top-[7.5rem] sm:max-w-[calc(100%-1.5rem)] ${
+          selectedZone ? "right-2 sm:right-[min(92vw,400px)]" : "right-2 sm:right-3"
         }`}
       >
         <div className="obs-panel hidden flex-wrap items-end gap-3 p-3 md:flex">
@@ -101,7 +101,7 @@ export function ObservatoryMapShell({ molecules }: Props) {
 
       {/* Zone intel panel */}
       {selectedZone ? (
-        <div className="absolute right-3 top-[7.5rem] z-[900] w-[min(92vw,380px)]">
+        <div className="absolute bottom-14 left-2 right-2 z-[900] sm:bottom-auto sm:left-auto sm:right-3 sm:top-[7.5rem] sm:w-[min(92vw,380px)]">
           <ZonePopup zone={selectedZone} onClose={() => setSelectedZone(null)} />
         </div>
       ) : null}
