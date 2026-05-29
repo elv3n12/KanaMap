@@ -48,7 +48,7 @@ export function ObsLegend() {
     );
 
     g.select(".domain").remove();
-    g.selectAll("text").attr("fill", "#71717a").attr("font-size", "9px").attr("font-family", "inherit");
+    g.selectAll("text").attr("fill", "#8b8b94").attr("font-size", "9px").attr("font-family", "inherit");
     g.selectAll("line").remove();
   }, []);
 

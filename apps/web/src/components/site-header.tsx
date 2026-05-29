@@ -41,7 +41,23 @@ export async function SiteHeader() {
             className="ml-1 shrink-0 rounded border border-violet-600/50 bg-obs-violet p-2 font-mono text-xs font-medium uppercase tracking-wider text-white transition hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/80 sm:ml-2 sm:px-3 sm:py-1.5"
             aria-label="Submit a report"
           >
-            <span className="hidden sm:inline">Report</span>
+            <span className="hidden sm:inline-flex sm:items-center sm:gap-1.5">
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Report
+            </span>
             <svg
               className="h-4 w-4 sm:hidden"
               fill="none"

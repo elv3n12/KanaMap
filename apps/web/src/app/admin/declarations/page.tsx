@@ -38,7 +38,7 @@ export default async function AdminDeclarationsPage() {
         <h2 className="text-lg font-semibold text-zinc-100">Effects reported via reports</h2>
         <div className="mt-4 divide-y divide-obs-border">
           {reportsWithEffects.length === 0 ? (
-            <p className="py-4 text-sm text-zinc-500">No adverse effects reported.</p>
+            <p className="py-4 text-sm text-zinc-400">No adverse effects reported.</p>
           ) : (
             reportsWithEffects.map((report) => (
               <div key={report.id} className="flex items-center justify-between gap-4 py-4">
@@ -49,7 +49,7 @@ export default async function AdminDeclarationsPage() {
                   <p className="text-sm text-zinc-400">
                     {report.location.displayZone} · <span className="text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</span>
                   </p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-xs text-zinc-400">
                     Substances: {report.molecules.map((m) => m.molecule.name).join(", ") || "—"}
                   </p>
                   <p className="mt-0.5 text-xs text-red-400">

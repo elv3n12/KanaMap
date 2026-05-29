@@ -80,8 +80,8 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: S
           {logs.map((log) => (
             <p key={log.id} className="rounded-md bg-obs-elevated p-3 text-zinc-300">
               <span className="font-semibold text-obs-signal">{log.action}</span> · {log.targetType}
-              {log.targetId ? `:${log.targetId}` : ""} · <span className="text-zinc-500">{log.user?.email ?? "system"}</span> ·{" "}
-              <span className="text-zinc-500">{log.createdAt.toLocaleString("en-GB")}</span>
+              {log.targetId ? `:${log.targetId}` : ""} · <span className="text-zinc-400">{log.user?.email ?? "system"}</span> ·{" "}
+              <span className="text-zinc-400">{log.createdAt.toLocaleString("en-GB")}</span>
             </p>
           ))}
         </div>

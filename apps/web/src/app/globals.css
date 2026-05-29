@@ -13,7 +13,7 @@
   --obs-danger: #dc2626;
   --obs-warning: #f59e0b;
   --obs-success: #10b981;
-  --obs-muted: #71717a;
+  --obs-muted: #8b8b94;
   --background: var(--obs-void);
   --foreground: #f4f4f5;
 }
@@ -63,7 +63,7 @@
   input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea {
-    @apply rounded-md border border-obs-border bg-obs-surface text-zinc-100 placeholder:text-zinc-500;
+    @apply rounded-md border border-obs-border bg-obs-surface text-zinc-100 placeholder:text-zinc-400;
   }
 
   input:not([type="checkbox"]):not([type="radio"]):focus-visible,

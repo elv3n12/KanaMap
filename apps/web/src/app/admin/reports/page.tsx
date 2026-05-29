@@ -57,7 +57,7 @@ type ReportRow = Awaited<
 
 function ReportList({ reports, empty }: { reports: ReportRow[]; empty?: string }) {
   if (reports.length === 0) {
-    return <p className="mt-4 py-4 text-sm text-zinc-500">{empty ?? "No items."}</p>;
+    return <p className="mt-4 py-4 text-sm text-zinc-400">{empty ?? "No items."}</p>;
   }
 
   return (

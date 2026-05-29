@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PlaceType, ProductType, ProofLevel, ReportStatus } from "@prisma/client";
+import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { publicStatuses } from "@/lib/moderation";
 import { serializeZoneAggregate, type PublicReport } from "@/lib/report-serializers";
@@ -14,6 +15,7 @@ const includeReport = {
 } as const;
 
 export async function GET(request: Request) {
+  const session = await auth();
   const url = new URL(request.url);
   const countryCode = url.searchParams.get("countryCode") || undefined;
   const city = url.searchParams.get("city") || undefined;
@@ -76,7 +78,10 @@ export async function GET(request: Request) {
   }
 
   const zones = Array.from(byLocation.values()).map((group) =>
-    serializeZoneAggregate({ location: group[0].location, reports: group }),
+    serializeZoneAggregate(
+      { location: group[0].location, reports: group },
+      { viewerUserId: session?.user?.id },
+    ),
   );
 
   return NextResponse.json({ zones });

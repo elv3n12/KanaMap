@@ -67,9 +67,15 @@ export default async function AccountPage() {
                   <p className="mt-1 text-sm text-zinc-400">
                     {report.location.displayZone} · <span className="text-obs-signal">{REPORT_STATUS_LABELS[report.moderationStatus]}</span>
                   </p>
+                  <Link
+                    href={`/reports/${report.id}/edit`}
+                    className="mt-2 inline-block text-sm text-obs-signal underline hover:text-obs-violet"
+                  >
+                    Complete report
+                  </Link>
                 </div>
               ))}
-              {reports.length === 0 ? <p className="py-4 text-sm text-zinc-500">No reports yet.</p> : null}
+              {reports.length === 0 ? <p className="py-4 text-sm text-zinc-400">No reports yet.</p> : null}
             </div>
           </ObsPanel>
 

@@ -12,7 +12,7 @@ export const obsColors = {
   danger: "#DC2626",
   warning: "#F59E0B",
   success: "#10B981",
-  muted: "#71717A",
+  muted: "#8B8B94",
 } as const;
 
 export const obsRadii = {

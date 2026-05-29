@@ -42,7 +42,7 @@ export default async function AdminReferentielsPage() {
           <div className="mt-3 space-y-2 text-sm text-zinc-400">
             {products.map((product) => (
               <p key={product.id}>
-                {product.commercialName} {product.brand ? <span className="text-zinc-500">· {product.brand.name}</span> : ""}
+                {product.commercialName} {product.brand ? <span className="text-zinc-400">· {product.brand.name}</span> : ""}
               </p>
             ))}
           </div>
@@ -61,14 +61,14 @@ function Lookup({ title, type, labels }: { title: string; type: string; labels: 
         <input
           required
           name="label"
-          className="min-w-0 flex-1 rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-500"
+          className="min-w-0 flex-1 rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-400"
           placeholder="Add…"
         />
         <ObsButton type="submit" variant="primary">
           Add
         </ObsButton>
       </form>
-      <p className="mt-3 text-sm leading-6 text-zinc-500">{labels.join(", ") || "None yet."}</p>
+      <p className="mt-3 text-sm leading-6 text-zinc-400">{labels.join(", ") || "None yet."}</p>
     </ObsPanel>
   );
 }

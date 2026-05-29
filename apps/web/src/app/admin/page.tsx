@@ -55,13 +55,13 @@ export default async function AdminDashboardPage() {
         <StatCard label="Users" value={counts.totalUsers} href="/admin/users" adminOnly />
       </div>
 
-      <p className="text-sm text-zinc-500">{roleSummary || "No users."}</p>
+      <p className="text-sm text-zinc-400">{roleSummary || "No users."}</p>
 
       <ObsPanel className="p-5">
         <h2 className="text-lg font-semibold text-zinc-100">Latest published reports</h2>
         <div className="mt-4 divide-y divide-obs-border">
           {recentPublished.length === 0 ? (
-            <p className="py-3 text-sm text-zinc-500">No published reports.</p>
+            <p className="py-3 text-sm text-zinc-400">No published reports.</p>
           ) : (
             recentPublished.map((report) => (
               <div key={report.id} className="flex items-center justify-between gap-4 py-3">
@@ -85,16 +85,16 @@ export default async function AdminDashboardPage() {
           <h2 className="text-lg font-semibold text-zinc-100">Recent moderation actions</h2>
           <div className="mt-4 space-y-2 text-sm">
             {recentActions.length === 0 ? (
-              <p className="text-zinc-500">No recent actions.</p>
+              <p className="text-zinc-400">No recent actions.</p>
             ) : (
               recentActions.map((action) => (
                 <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
                   <span className="text-obs-signal">{action.action}</span>
                   {action.report?.productCommercialName ? ` · ${action.report.productCommercialName}` : ""}
                   {" · "}
-                  <span className="text-zinc-500">{action.moderator?.email ?? "system"}</span>
+                  <span className="text-zinc-400">{action.moderator?.email ?? "system"}</span>
                   {" · "}
-                  <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
+                  <span className="text-zinc-400">{action.createdAt.toLocaleString("en-GB")}</span>
                 </p>
               ))
             )}
@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
             {recentUsers.map((user) => (
               <p key={user.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
                 {user.email} · <span className="text-obs-signal">{USER_ROLE_LABELS[user.role]}</span> ·{" "}
-                <span className="text-zinc-500">{user.createdAt.toLocaleDateString("en-GB")}</span>
+                <span className="text-zinc-400">{user.createdAt.toLocaleDateString("en-GB")}</span>
               </p>
             ))}
           </div>
@@ -139,7 +139,7 @@ function StatCard({
     >
       <p className="obs-label text-zinc-400">{label}</p>
       <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">{value}</p>
-      {adminOnly ? <p className="mt-1 text-xs text-zinc-500">Admin only</p> : null}
+      {adminOnly ? <p className="mt-1 text-xs text-zinc-400">Admin only</p> : null}
     </Link>
   );
 }

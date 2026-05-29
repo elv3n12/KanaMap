@@ -33,7 +33,7 @@ export function DeclarationActions({ declarationId }: Props) {
         id="decl-notes"
         value={notes}
         onChange={(event) => setNotes(event.target.value)}
-        className="mt-1 w-full rounded-md border border-obs-border bg-obs-elevated p-3 text-zinc-100 placeholder:text-zinc-500"
+        className="mt-1 w-full rounded-md border border-obs-border bg-obs-elevated p-3 text-zinc-100 placeholder:text-zinc-400"
         rows={4}
       />
       <label htmlFor="decl-proof" className="obs-label mt-3 block text-zinc-300">

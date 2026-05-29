@@ -71,8 +71,8 @@ export default async function AdminReportDetailPage({ params }: Props) {
             {report.moderationActions.map((action) => (
               <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
                 <span className="text-obs-signal">{action.action}</span> · {action.moderator?.email ?? "system"} ·{" "}
-                <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
-                {action.notes ? <span className="text-zinc-500"> · {action.notes}</span> : null}
+                <span className="text-zinc-400">{action.createdAt.toLocaleString("en-GB")}</span>
+                {action.notes ? <span className="text-zinc-400"> · {action.notes}</span> : null}
               </p>
             ))}
           </div>
@@ -88,7 +88,7 @@ export default async function AdminReportDetailPage({ params }: Props) {
 function Info({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div>
-      <dt className="obs-label text-zinc-500">{label}</dt>
+      <dt className="obs-label text-zinc-400">{label}</dt>
       <dd className={`mt-1 text-sm ${highlight ? "text-red-400" : "text-zinc-300"}`}>{value}</dd>
     </div>
   );

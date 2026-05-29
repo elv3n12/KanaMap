@@ -187,7 +187,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
               onFocus={() => {
                 if (citySuggestions.length > 0 && !selectedCity) setShowSuggestions(true);
               }}
-              className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500"
+              className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400"
               placeholder="Commencez à taper le nom de la ville..."
             />
             {showSuggestions && citySuggestions.length > 0 && (
@@ -201,7 +201,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
                     >
                       <span className="font-medium">{city.name}</span>
                       {city.state && (
-                        <span className="ml-1 text-zinc-500">({city.state})</span>
+                        <span className="ml-1 text-zinc-400">({city.state})</span>
                       )}
                     </button>
                   </li>
@@ -230,9 +230,9 @@ export function ReportForm({ molecules, claims, effects }: Props) {
               </option>
             ))}
           </select>
-          <input name="placeOtherLabel" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Si autre, préciser" />
-          <input name="brandRawName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Marque observée" />
-          <input required name="productCommercialName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500" placeholder="Nom commercial du produit" />
+          <input name="placeOtherLabel" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400" placeholder="Si autre, préciser" />
+          <input name="brandRawName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400" placeholder="Marque observée" />
+          <input required name="productCommercialName" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400" placeholder="Nom commercial du produit" />
           <select required name="productType" className="rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100">
             {Object.entries(PRODUCT_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -279,7 +279,7 @@ export function ReportForm({ molecules, claims, effects }: Props) {
         </div>
         <textarea
           name="narrative"
-          className="mt-4 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500"
+          className="mt-4 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400"
           rows={5}
           placeholder="Décrire prudemment ce qui a été observé, sans données personnelles ni information facilitant l'accès au produit."
         />

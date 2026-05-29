@@ -49,7 +49,7 @@ export default function ContactPage() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  className="min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
+                  className="min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
                   placeholder="you@example.com"
                 />
               </div>
@@ -62,7 +62,7 @@ export default function ContactPage() {
                   required
                   name="message"
                   rows={5}
-                  className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
+                  className="w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
                   placeholder="Your message…"
                 />
               </div>

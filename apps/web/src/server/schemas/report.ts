@@ -47,17 +47,17 @@ export const reportSchema = z
     exactAddress: z.string().trim().optional(),
     exactLat: z.coerce.number().optional(),
     exactLng: z.coerce.number().optional(),
-    placeType: z.nativeEnum(PlaceType),
+    placeType: z.nativeEnum(PlaceType).default(PlaceType.CBD_SHOP),
     placeOtherLabel: z.string().trim().optional(),
     brandRawName: z.string().trim().optional(),
-    productCommercialName: z.string().trim().min(1, "Commercial name is required"),
-    productType: z.nativeEnum(ProductType),
+    productCommercialName: z.string().trim().optional(),
+    productType: z.nativeEnum(ProductType).default(ProductType.OTHER),
     productOtherLabel: z.string().trim().optional(),
     formOfUse: z.nativeEnum(FormOfUse).optional(),
     quantityObserved: optionalDecimal,
     priceObserved: optionalDecimal,
     priceMode: z.nativeEnum(PriceMode).optional(),
-    observationDate: z.coerce.date(),
+    observationDate: z.coerce.date().default(() => new Date()),
     narrative: z.string().trim().max(5000).optional(),
     proofLevel: z.nativeEnum(ProofLevel).default("L1_TESTIMONY"),
     announcedMoleculeIds: z.array(z.string().min(1).max(64)).max(30).default([]),
@@ -83,6 +83,16 @@ export const reportSchema = z
     contactEmail: z.string().email().optional().or(z.literal("")),
   })
   .superRefine((data, ctx) => {
+    const hasSubstance =
+      data.announcedMoleculeIds.length > 0 || (data.announcedMoleculeNames?.length ?? 0) > 0;
+    const hasProductName = Boolean(data.productCommercialName?.trim());
+    if (!hasSubstance && !hasProductName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Substance or product name is required.",
+        path: ["announcedMoleculeIds"],
+      });
+    }
     if (data.consumed && !data.bought) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -104,21 +114,12 @@ export const reportSchema = z
         path: ["reasonNotConsumed"],
       });
     }
-    if (data.consumed) {
-      if (!data.formOfUse) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Please indicate the form of consumption.",
-          path: ["formOfUse"],
-        });
-      }
-      if (!data.effectsMatchClaim) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Please indicate if the effects match the claims.",
-          path: ["effectsMatchClaim"],
-        });
-      }
+    if (data.consumed && !data.formOfUse) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please indicate the form of consumption.",
+        path: ["formOfUse"],
+      });
     }
     if (data.wantsContact && !data.contactEmail) {
       ctx.addIssue({
@@ -127,9 +128,67 @@ export const reportSchema = z
         path: ["contactEmail"],
       });
     }
+  })
+  .transform((data) => {
+    const productCommercialName =
+      data.productCommercialName?.trim() ||
+      data.announcedMoleculeNames?.[0]?.trim() ||
+      "Observed product";
+    return { ...data, productCommercialName };
   });
 
 export type ReportInput = z.infer<typeof reportSchema>;
+
+export const reportUpdateSchema = z
+  .object({
+    placeType: z.nativeEnum(PlaceType).optional(),
+    placeOtherLabel: z.string().trim().optional(),
+    productType: z.nativeEnum(ProductType).optional(),
+    consumed: boolField.optional(),
+    formOfUse: z.nativeEnum(FormOfUse).optional(),
+    positiveEffectIds: z.array(z.string().min(1).max(64)).max(30).optional(),
+    adverseEffectIds: z.array(z.string().min(1).max(64)).max(30).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.consumed && !data.formOfUse) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please indicate the form of consumption.",
+        path: ["formOfUse"],
+      });
+    }
+  });
+
+export type ReportUpdateInput = z.infer<typeof reportUpdateSchema>;
+
+export function parseReportUpdateJson(body: unknown) {
+  return reportUpdateSchema.parse(body);
+}
+
+export async function validateCatalogIdsForUpdate(input: {
+  adverseEffectIds: string[];
+  positiveEffectIds: string[];
+}): Promise<string[]> {
+  const unique = {
+    adverseEffect: Array.from(new Set(input.adverseEffectIds.filter(Boolean))),
+    positiveEffect: Array.from(new Set(input.positiveEffectIds.filter(Boolean))),
+  };
+
+  const { db } = await import("@/lib/db");
+  const [adverseCount, positiveCount] = await Promise.all([
+    unique.adverseEffect.length
+      ? db.adverseEffect.count({ where: { id: { in: unique.adverseEffect } } })
+      : Promise.resolve(0),
+    unique.positiveEffect.length
+      ? db.positiveEffect.count({ where: { id: { in: unique.positiveEffect } } })
+      : Promise.resolve(0),
+  ]);
+
+  const invalid: string[] = [];
+  if (adverseCount !== unique.adverseEffect.length) invalid.push("adverseEffectIds");
+  if (positiveCount !== unique.positiveEffect.length) invalid.push("positiveEffectIds");
+  return invalid;
+}
 
 export const adverseEffectDeclarationSchema = z.object({
   countryCode: z.string().trim().min(2).max(2),

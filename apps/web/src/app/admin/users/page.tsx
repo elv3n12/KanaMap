@@ -57,7 +57,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
             <input
               name="q"
               defaultValue={q}
-              className="w-full rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-500"
+              className="w-full rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-400"
               placeholder="search…"
             />
           </label>
@@ -116,7 +116,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: S
                 <td className="p-3 font-medium text-zinc-200">{user.email}</td>
                 <td className="p-3 text-zinc-300">{USER_ROLE_LABELS[user.role]}</td>
                 <td className="p-3">
-                  <span className={user.emailVerifiedAt ? "text-emerald-400" : "text-zinc-500"}>
+                  <span className={user.emailVerifiedAt ? "text-emerald-400" : "text-zinc-400"}>
                     {user.emailVerifiedAt ? "Yes" : "No"}
                   </span>
                 </td>

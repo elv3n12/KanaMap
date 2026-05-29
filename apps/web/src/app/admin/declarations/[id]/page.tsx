@@ -37,23 +37,23 @@ export default async function AdminDeclarationDetailPage({ params }: Props) {
           ) : null}
           <dl className="mt-6 grid gap-3 text-sm">
             <div>
-              <dt className="obs-label text-zinc-500">Product</dt>
+              <dt className="obs-label text-zinc-400">Product</dt>
               <dd className="text-zinc-300">{declaration.productNameRaw ?? "Not specified"}</dd>
             </div>
             <div>
-              <dt className="obs-label text-zinc-500">Molecules</dt>
+              <dt className="obs-label text-zinc-400">Molecules</dt>
               <dd className="text-zinc-300">{declaration.molecules.map((item) => item.molecule.name).join(", ") || "Not specified"}</dd>
             </div>
             <div>
-              <dt className="obs-label text-zinc-500">Effects</dt>
+              <dt className="obs-label text-zinc-400">Effects</dt>
               <dd className="text-red-400">{declaration.effects.map((item) => item.effect.label).join(", ") || "Not specified"}</dd>
             </div>
             <div>
-              <dt className="obs-label text-zinc-500">Approximate period</dt>
+              <dt className="obs-label text-zinc-400">Approximate period</dt>
               <dd className="text-zinc-300">{declaration.approximatePeriod ?? "—"}</dd>
             </div>
             <div>
-              <dt className="obs-label text-zinc-500">Duration</dt>
+              <dt className="obs-label text-zinc-400">Duration</dt>
               <dd className="text-zinc-300">{declaration.effectDuration ?? "—"}</dd>
             </div>
           </dl>
@@ -67,7 +67,7 @@ export default async function AdminDeclarationDetailPage({ params }: Props) {
             {declaration.moderationActions.map((action) => (
               <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
                 <span className="text-obs-signal">{action.action}</span> · {action.moderator?.email ?? "system"} ·{" "}
-                <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
+                <span className="text-zinc-400">{action.createdAt.toLocaleString("en-GB")}</span>
               </p>
             ))}
           </div>

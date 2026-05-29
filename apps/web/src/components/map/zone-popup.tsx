@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ZonePayload } from "@/lib/report-serializers";
 import { PROOF_LEVEL_LABELS } from "@/lib/constants";
 import { ObsBadge, ObsButton, ObsKpi, ObsPanel } from "@/components/ui/obs";
@@ -83,6 +84,20 @@ export function ZonePopup({ zone, onClose }: Props) {
           style={{ background: severityHex(severity), opacity: 0.85 }}
           aria-hidden
         />
+
+        {zone.ownReportIds.length > 0 ? (
+          <div className="border-t border-obs-border pt-3">
+            {zone.ownReportIds.map((reportId) => (
+              <Link
+                key={reportId}
+                href={`/reports/${reportId}/edit`}
+                className="inline-flex min-h-9 w-full items-center justify-center rounded border border-obs-border bg-obs-elevated px-3 py-2 text-sm font-medium text-obs-signal transition hover:border-obs-violet hover:text-white"
+              >
+                Modify my report
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </div>
     </ObsPanel>
   );

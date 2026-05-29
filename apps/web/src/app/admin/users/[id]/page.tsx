@@ -52,15 +52,15 @@ export default async function AdminUserDetailPage({ params }: Props) {
         <h2 className="text-lg font-semibold text-zinc-100">Information</h2>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="obs-label text-zinc-500">Joined</dt>
+            <dt className="obs-label text-zinc-400">Joined</dt>
             <dd className="text-zinc-300">{user.createdAt.toLocaleString("en-GB")}</dd>
           </div>
           <div>
-            <dt className="obs-label text-zinc-500">Charter accepted</dt>
+            <dt className="obs-label text-zinc-400">Charter accepted</dt>
             <dd className="text-zinc-300">{user.charterAcceptedAt?.toLocaleDateString("en-GB") ?? "—"}</dd>
           </div>
           <div>
-            <dt className="obs-label text-zinc-500">Suspended</dt>
+            <dt className="obs-label text-zinc-400">Suspended</dt>
             <dd className="text-zinc-300">{user.bannedAt?.toLocaleString("en-GB") ?? "—"}</dd>
           </div>
         </dl>
@@ -114,7 +114,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                   <span className="obs-label mb-1 block text-zinc-300">Suspension reason</span>
                   <input
                     name="reason"
-                    className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-500"
+                    className="block rounded-md border border-obs-border bg-obs-surface p-2 text-zinc-100 placeholder:text-zinc-400"
                     placeholder="Optional"
                   />
                 </label>
@@ -133,14 +133,14 @@ export default async function AdminUserDetailPage({ params }: Props) {
           </div>
         </ObsPanel>
       ) : (
-        <p className="text-sm text-zinc-500">You cannot modify your own account from this page.</p>
+        <p className="text-sm text-zinc-400">You cannot modify your own account from this page.</p>
       )}
 
       <ObsPanel className="p-5">
         <h2 className="text-lg font-semibold text-zinc-100">Reports ({user.reports.length})</h2>
         <div className="mt-4 divide-y divide-obs-border">
           {user.reports.length === 0 ? (
-            <p className="py-3 text-sm text-zinc-500">No reports.</p>
+            <p className="py-3 text-sm text-zinc-400">No reports.</p>
           ) : (
             user.reports.map((report) => (
               <div key={report.id} className="flex items-center justify-between gap-4 py-3">
@@ -163,7 +163,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
         <h2 className="text-lg font-semibold text-zinc-100">Declarations ({user.declarations.length})</h2>
         <div className="mt-4 divide-y divide-obs-border">
           {user.declarations.length === 0 ? (
-            <p className="py-3 text-sm text-zinc-500">No declarations.</p>
+            <p className="py-3 text-sm text-zinc-400">No declarations.</p>
           ) : (
             user.declarations.map((declaration) => (
               <div key={declaration.id} className="flex items-center justify-between gap-4 py-3">

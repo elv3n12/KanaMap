@@ -53,7 +53,10 @@ export type ZoneAggregate = {
   reports: PublicReport[];
 };
 
-export function serializeZoneAggregate({ location, reports }: ZoneAggregate) {
+export function serializeZoneAggregate(
+  { location, reports }: ZoneAggregate,
+  options?: { viewerUserId?: string },
+) {
   const molecules = new Map<string, string>();
   const productTypes = new Set<string>();
   const effects = new Set<string>();
@@ -66,6 +69,10 @@ export function serializeZoneAggregate({ location, reports }: ZoneAggregate) {
     report.adverseEffects.forEach((item) => effects.add(item.effect.label));
     statuses.add(report.moderationStatus);
   }
+
+  const ownReportIds = options?.viewerUserId
+    ? reports.filter((r) => r.createdById === options.viewerUserId).map((r) => r.id)
+    : [];
 
   return {
     locationId: location.id,
@@ -82,6 +89,7 @@ export function serializeZoneAggregate({ location, reports }: ZoneAggregate) {
     adverseEffects: Array.from(effects),
     statuses: Array.from(statuses),
     maxProofLevel: maxProofLevel(proofLevels),
+    ownReportIds,
   };
 }
 

@@ -34,7 +34,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
                 required
                 name="email"
                 type="email"
-                className="min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
+                className="min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
               />
             </div>
             <ObsButton type="submit" variant="primary" className="w-full">

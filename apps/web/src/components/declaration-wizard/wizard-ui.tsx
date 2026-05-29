@@ -28,7 +28,7 @@ export function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`mt-1 min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
+      className={`mt-1 min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
     />
   );
 }
@@ -37,7 +37,7 @@ export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return (
     <textarea
       {...props}
-      className={`mt-1 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
+      className={`mt-1 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-400 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40 ${props.className ?? ""}`}
     />
   );
 }

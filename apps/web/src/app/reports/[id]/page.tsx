@@ -46,7 +46,7 @@ export default async function PublicReportPage({ params }: Props) {
           <p className="mt-3 whitespace-pre-line leading-7 text-zinc-300">{publicReport.narrative}</p>
         </section>
       ) : null}
-      <p className="mt-6 text-sm text-zinc-500">
+      <p className="mt-6 text-sm text-zinc-400">
         The exact address and precise coordinates are not published. This record documents an
         observation, without constituting a recommendation or access indication.
       </p>
@@ -57,7 +57,7 @@ export default async function PublicReportPage({ params }: Props) {
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="obs-label text-zinc-500">{label}</dt>
+      <dt className="obs-label text-zinc-400">{label}</dt>
       <dd className="mt-1 text-sm text-zinc-300">{value}</dd>
     </div>
   );
