@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { DeclarationActions } from "@/components/moderation/declaration-actions";
 import { REPORT_STATUS_LABELS } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { ObsPanel } from "@/components/ui/obs";
 
 export const dynamic = "force-dynamic";
 
@@ -23,53 +24,54 @@ export default async function AdminDeclarationDetailPage({ params }: Props) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <main className="space-y-6">
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-semibold">Déclaration d&apos;effet indésirable</h1>
-          <p className="mt-2 text-sm text-slate-600">{REPORT_STATUS_LABELS[declaration.moderationStatus]}</p>
+        <ObsPanel className="p-6">
+          <p className="obs-label text-obs-signal">{REPORT_STATUS_LABELS[declaration.moderationStatus]}</p>
+          <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Adverse effect declaration</h1>
           {declaration.createdBy ? (
-            <p className="mt-2 text-sm text-slate-600">
-              Auteur :{" "}
-              <a className="text-blue-700 underline" href={`/admin/utilisateurs/${declaration.createdBy.id}`}>
+            <p className="mt-2 text-sm text-zinc-400">
+              Author:{" "}
+              <a className="text-obs-signal hover:underline" href={`/admin/users/${declaration.createdBy.id}`}>
                 {declaration.createdBy.email}
               </a>
             </p>
           ) : null}
           <dl className="mt-6 grid gap-3 text-sm">
             <div>
-              <dt className="font-medium text-slate-500">Produit</dt>
-              <dd>{declaration.productNameRaw ?? "Non précisé"}</dd>
+              <dt className="obs-label text-zinc-500">Product</dt>
+              <dd className="text-zinc-300">{declaration.productNameRaw ?? "Not specified"}</dd>
             </div>
             <div>
-              <dt className="font-medium text-slate-500">Molécules</dt>
-              <dd>{declaration.molecules.map((item) => item.molecule.name).join(", ") || "Non précisées"}</dd>
+              <dt className="obs-label text-zinc-500">Molecules</dt>
+              <dd className="text-zinc-300">{declaration.molecules.map((item) => item.molecule.name).join(", ") || "Not specified"}</dd>
             </div>
             <div>
-              <dt className="font-medium text-slate-500">Effets</dt>
-              <dd>{declaration.effects.map((item) => item.effect.label).join(", ") || "Non précisés"}</dd>
+              <dt className="obs-label text-zinc-500">Effects</dt>
+              <dd className="text-red-400">{declaration.effects.map((item) => item.effect.label).join(", ") || "Not specified"}</dd>
             </div>
             <div>
-              <dt className="font-medium text-slate-500">Période approximative</dt>
-              <dd>{declaration.approximatePeriod ?? "—"}</dd>
+              <dt className="obs-label text-zinc-500">Approximate period</dt>
+              <dd className="text-zinc-300">{declaration.approximatePeriod ?? "—"}</dd>
             </div>
             <div>
-              <dt className="font-medium text-slate-500">Durée</dt>
-              <dd>{declaration.effectDuration ?? "—"}</dd>
+              <dt className="obs-label text-zinc-500">Duration</dt>
+              <dd className="text-zinc-300">{declaration.effectDuration ?? "—"}</dd>
             </div>
           </dl>
           {declaration.narrative ? (
-            <p className="mt-6 whitespace-pre-line leading-7 text-slate-700">{declaration.narrative}</p>
+            <p className="mt-6 whitespace-pre-line leading-7 text-zinc-300">{declaration.narrative}</p>
           ) : null}
-        </section>
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Historique</h2>
+        </ObsPanel>
+        <ObsPanel className="p-6">
+          <h2 className="text-lg font-semibold text-zinc-100">History</h2>
           <div className="mt-4 space-y-2 text-sm">
             {declaration.moderationActions.map((action) => (
-              <p key={action.id} className="rounded-lg bg-slate-50 p-2">
-                {action.action} · {action.moderator?.email ?? "système"} · {action.createdAt.toLocaleString("fr-FR")}
+              <p key={action.id} className="rounded-md bg-obs-elevated p-2 text-zinc-300">
+                <span className="text-obs-signal">{action.action}</span> · {action.moderator?.email ?? "system"} ·{" "}
+                <span className="text-zinc-500">{action.createdAt.toLocaleString("en-GB")}</span>
               </p>
             ))}
           </div>
-        </section>
+        </ObsPanel>
       </main>
       <aside>
         <DeclarationActions declarationId={declaration.id} />

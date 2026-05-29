@@ -18,7 +18,7 @@ export default async function NewReportPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <p className="mb-6 text-sm text-slate-700">
+      <p className="mb-6 text-sm text-zinc-400">
         I want to report a point of sale of synthetic or semi-synthetic cannabinoids. Data that
         would facilitate direct access to the product is not publicly exposed.
       </p>

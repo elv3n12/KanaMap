@@ -26,12 +26,12 @@ export default async function PublicReportPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <p className="text-sm font-medium text-slate-600">Published and anonymized report</p>
-      <h1 className="mt-2 text-3xl font-semibold">{publicReport.productName}</h1>
-      <p className="mt-2 text-slate-700">
+      <p className="obs-label text-obs-signal">Published and anonymized report</p>
+      <h1 className="mt-2 text-2xl font-semibold text-zinc-100">{publicReport.productName}</h1>
+      <p className="mt-2 text-zinc-400">
         Zone: {publicReport.zone} · {PLACE_TYPE_LABELS[publicReport.placeType]}
       </p>
-      <div className="mt-6 grid gap-4 rounded-2xl bg-white p-6 shadow-sm md:grid-cols-2">
+      <div className="mt-6 grid gap-4 rounded-lg border border-obs-border bg-obs-surface p-6 md:grid-cols-2">
         <Info label="Product type" value={publicReport.productType ? PRODUCT_TYPE_LABELS[publicReport.productType] : "Not specified"} />
         <Info label="Proof level" value={PROOF_LEVEL_LABELS[publicReport.proofLevel]} />
         <Info label="Status" value={REPORT_STATUS_LABELS[publicReport.moderationStatus]} />
@@ -41,12 +41,12 @@ export default async function PublicReportPage({ params }: Props) {
         <Info label="Reported effects" value={publicReport.adverseEffects.join(", ") || "None reported"} />
       </div>
       {publicReport.narrative ? (
-        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Moderated description</h2>
-          <p className="mt-3 whitespace-pre-line leading-7 text-slate-700">{publicReport.narrative}</p>
+        <section className="mt-6 rounded-lg border border-obs-border bg-obs-surface p-6">
+          <h2 className="text-lg font-semibold text-zinc-100">Moderated description</h2>
+          <p className="mt-3 whitespace-pre-line leading-7 text-zinc-300">{publicReport.narrative}</p>
         </section>
       ) : null}
-      <p className="mt-6 text-sm text-slate-500">
+      <p className="mt-6 text-sm text-zinc-500">
         The exact address and precise coordinates are not published. This record documents an
         observation, without constituting a recommendation or access indication.
       </p>
@@ -57,8 +57,8 @@ export default async function PublicReportPage({ params }: Props) {
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-sm font-medium text-slate-500">{label}</dt>
-      <dd className="mt-1 text-sm text-slate-900">{value}</dd>
+      <dt className="obs-label text-zinc-500">{label}</dt>
+      <dd className="mt-1 text-sm text-zinc-300">{value}</dd>
     </div>
   );
 }

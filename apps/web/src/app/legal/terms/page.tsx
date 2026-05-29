@@ -1,8 +1,9 @@
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-semibold">Terms of Use</h1>
-      <div className="mt-6 space-y-4 rounded-2xl bg-white p-6 leading-7 shadow">
+      <p className="obs-label text-obs-signal">Legal</p>
+      <h1 className="mt-2 text-2xl font-semibold text-zinc-100">Terms of Use</h1>
+      <div className="mt-6 space-y-4 rounded-lg border border-obs-border bg-obs-surface p-6 leading-7 text-zinc-300">
         <p>
           Cannabinoid Observatory Europe is an information service for citizen documentation and harm reduction. Content published by
           users is provided for informational purposes and may be moderated or removed.

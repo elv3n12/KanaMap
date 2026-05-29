@@ -1,4 +1,4 @@
-import { btnPrimaryBlack } from "@/lib/ui/button-classes";
+import { ObsButton, ObsPanel } from "@/components/ui/obs";
 
 type Props = { params: Promise<{ token: string }> };
 
@@ -6,17 +6,33 @@ export default async function ResetPasswordPage({ params }: Props) {
   const { token } = await params;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <h1 className="text-3xl font-semibold">New password</h1>
-      <form action={`/api/reset-password/${token}`} method="post" className="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm">
-        <label className="block text-sm font-medium">
-          New password
-          <input required minLength={8} name="password" type="password" className="mt-1 w-full rounded-lg border p-3" />
-        </label>
-        <button className={btnPrimaryBlack} type="submit">
-          Save
-        </button>
-      </form>
+    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center">
+          <p className="obs-label text-obs-signal">Account recovery</p>
+          <h1 className="mt-2 text-2xl font-semibold text-zinc-100">New password</h1>
+        </div>
+        <ObsPanel className="mt-6 p-6">
+          <form action={`/api/reset-password/${token}`} method="post" className="space-y-4">
+            <div>
+              <label htmlFor="password" className="obs-label mb-1.5 block text-zinc-300">
+                New password
+              </label>
+              <input
+                id="password"
+                required
+                minLength={8}
+                name="password"
+                type="password"
+                className="min-h-11 w-full rounded-md border border-obs-border bg-obs-surface p-3 text-zinc-100 placeholder:text-zinc-500 focus:border-obs-violet focus:outline-none focus:ring-2 focus:ring-obs-violet/40"
+              />
+            </div>
+            <ObsButton type="submit" variant="primary" className="w-full">
+              Save
+            </ObsButton>
+          </form>
+        </ObsPanel>
+      </div>
     </div>
   );
 }

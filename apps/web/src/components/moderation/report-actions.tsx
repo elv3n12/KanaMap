@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PROOF_LEVEL_LABELS } from "@/lib/constants";
-import { btnDestructive, btnPrimary, btnSecondary } from "@/lib/ui/button-classes";
+import { ObsButton } from "@/components/ui/obs";
 
 type Props = {
   reportId: string;
@@ -24,26 +24,26 @@ export function ReportActions({ reportId }: Props) {
   }
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-semibold text-slate-900">Actions de modération</h2>
-      <label htmlFor="mod-notes" className="mt-4 block text-sm font-medium text-slate-800">
-        Note interne ou motif
+    <div className="rounded-lg border border-obs-border bg-obs-surface p-5">
+      <h2 className="text-lg font-semibold text-zinc-100">Moderation actions</h2>
+      <label htmlFor="mod-notes" className="obs-label mt-4 block text-zinc-300">
+        Internal note / reason
       </label>
       <textarea
         id="mod-notes"
         value={notes}
         onChange={(event) => setNotes(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-slate-300 p-3 text-slate-900"
+        className="mt-1 w-full rounded-md border border-obs-border bg-obs-elevated p-3 text-zinc-100 placeholder:text-zinc-500"
         rows={4}
       />
-      <label htmlFor="mod-proof" className="mt-3 block text-sm font-medium text-slate-800">
-        Niveau de preuve
+      <label htmlFor="mod-proof" className="obs-label mt-3 block text-zinc-300">
+        Proof level
       </label>
       <select
         id="mod-proof"
         value={proofLevel}
         onChange={(event) => setProofLevel(event.target.value)}
-        className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 p-3 text-slate-900"
+        className="mt-1 min-h-11 w-full rounded-md border border-obs-border bg-obs-elevated p-3 text-zinc-100"
       >
         {Object.entries(PROOF_LEVEL_LABELS).map(([value, label]) => (
           <option key={value} value={value}>
@@ -52,30 +52,30 @@ export function ReportActions({ reportId }: Props) {
         ))}
       </select>
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        <button type="button" onClick={() => submit("PUBLISH")} className={btnPrimary}>
-          Publier
-        </button>
-        <button type="button" onClick={() => submit("PUBLISH_LIMITED")} className={btnSecondary}>
-          Publier limité
-        </button>
-        <button type="button" onClick={() => submit("REQUEST_PROOF")} className={btnSecondary}>
-          Demander preuves
-        </button>
-        <button type="button" onClick={() => submit("MASK_ADDRESS")} className={btnSecondary}>
-          Masquer adresse
-        </button>
-        <button type="button" onClick={() => submit("CHANGE_PROOF_LEVEL")} className={btnSecondary}>
-          Changer niveau preuve
-        </button>
-        <button type="button" onClick={() => submit("CONTEST")} className={btnSecondary}>
-          Contester
-        </button>
-        <button type="button" onClick={() => submit("REJECT")} className={btnDestructive}>
-          Rejeter
-        </button>
-        <button type="button" onClick={() => { if (confirm("Supprimer définitivement ce signalement ?")) submit("DELETE"); }} className={btnDestructive}>
-          Supprimer
-        </button>
+        <ObsButton variant="primary" onClick={() => submit("PUBLISH")}>
+          Publish
+        </ObsButton>
+        <ObsButton variant="outline" onClick={() => submit("PUBLISH_LIMITED")}>
+          Publish limited
+        </ObsButton>
+        <ObsButton variant="outline" onClick={() => submit("REQUEST_PROOF")}>
+          Request proof
+        </ObsButton>
+        <ObsButton variant="outline" onClick={() => submit("MASK_ADDRESS")}>
+          Mask address
+        </ObsButton>
+        <ObsButton variant="outline" onClick={() => submit("CHANGE_PROOF_LEVEL")}>
+          Change proof level
+        </ObsButton>
+        <ObsButton variant="outline" onClick={() => submit("CONTEST")}>
+          Contest
+        </ObsButton>
+        <ObsButton variant="danger" onClick={() => submit("REJECT")}>
+          Reject
+        </ObsButton>
+        <ObsButton variant="danger" onClick={() => { if (confirm("Permanently delete this report?")) submit("DELETE"); }}>
+          Delete
+        </ObsButton>
       </div>
     </div>
   );
